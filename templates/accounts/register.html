@@ -1,0 +1,34 @@
+<!-- filepath: c:\dev\django_project\slumSarathi\templates\accounts\register.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+</head>
+<body>
+    <h2>Register</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color:red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <label>Email:</label><br>
+        <input type="email" name="email" required><br><br>
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br><br>
+        <label>First Name:</label><br>
+        <input type="text" name="first_name" required><br><br>
+        <label>Last Name:</label><br>
+        <input type="text" name="last_name" required><br><br>
+        <label>User Type:</label><br>
+        <select name="user_type">
+            <option value="1">Student</option>
+            <option value="2">Event Organizer</option>
+            <option value="3">Admin</option>
+        </select><br><br>
+        <button type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+</body>
+</html>

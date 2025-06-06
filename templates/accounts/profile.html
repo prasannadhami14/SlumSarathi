@@ -1,0 +1,25 @@
+<!-- filepath: c:\dev\django_project\slumSarathi\templates\accounts\profile.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile</title>
+</head>
+<body>
+    <h2>Profile</h2>
+    <p><strong>Email:</strong> {{ user_obj.email }}</p>
+    <p><strong>First Name:</strong> {{ user_obj.first_name }}</p>
+    <p><strong>Last Name:</strong> {{ user_obj.last_name }}</p>
+    <p><strong>User Type:</strong> {{ user_obj.get_user_type_display }}</p>
+    {% if profile %}
+        <p><strong>Phone Number:</strong> {{ profile.phone_number }}</p>
+        <p><strong>Gender:</strong> {{ profile.get_gender_display }}</p>
+        <p><strong>Bio:</strong> {{ profile.bio }}</p>
+        <p><strong>Institution:</strong> {{ profile.institution }}</p>
+        <p><strong>Course of Study:</strong> {{ profile.course_of_study }}</p>
+        <p><strong>Organization:</strong> {{ profile.organization }}</p>
+        <p><strong>Website:</strong> <a href="{{ profile.website }}">{{ profile.website }}</a></p>
+    {% endif %}
+    <a href="{% url 'edit_profile' user_obj.id %}">Edit Profile</a> |
+    <a href="{% url 'logout' %}">Logout</a>
+</body>
+</html>

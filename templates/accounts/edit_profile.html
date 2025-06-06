@@ -1,0 +1,43 @@
+<!-- filepath: c:\dev\django_project\slumSarathi\templates\accounts\edit_profile.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile</title>
+</head>
+<body>
+    <h2>Edit Profile</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <p style="color:green;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <label>First Name:</label><br>
+        <input type="text" name="first_name" value="{{ user_obj.first_name }}"><br><br>
+        <label>Last Name:</label><br>
+        <input type="text" name="last_name" value="{{ user_obj.last_name }}"><br><br>
+        <label>Phone Number:</label><br>
+        <input type="text" name="phone_number" value="{{ profile.phone_number }}"><br><br>
+        <label>Gender:</label><br>
+        <select name="gender">
+            <option value="">---------</option>
+            <option value="M" {% if profile.gender == "M" %}selected{% endif %}>Male</option>
+            <option value="F" {% if profile.gender == "F" %}selected{% endif %}>Female</option>
+            <option value="O" {% if profile.gender == "O" %}selected{% endif %}>Other</option>
+        </select><br><br>
+        <label>Bio:</label><br>
+        <textarea name="bio">{{ profile.bio }}</textarea><br><br>
+        <label>Institution:</label><br>
+        <input type="text" name="institution" value="{{ profile.institution }}"><br><br>
+        <label>Course of Study:</label><br>
+        <input type="text" name="course_of_study" value="{{ profile.course_of_study }}"><br><br>
+        <label>Organization:</label><br>
+        <input type="text" name="organization" value="{{ profile.organization }}"><br><br>
+        <label>Website:</label><br>
+        <input type="url" name="website" value="{{ profile.website }}"><br><br>
+        <button type="submit">Save Changes</button>
+    </form>
+    <a href="{% url 'profile' user_obj.id %}">Back to Profile</a>
+</body>
+</html>
