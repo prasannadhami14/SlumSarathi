@@ -1,0 +1,17 @@
+<!-- filepath: c:\dev\django_project\slumSarathi\templates\base.html -->
+{%load static%}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}SlumSarathi{% endblock %}</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    {% include "header.html" %}
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    {% include "footer.html" %}
+</body>
+</html>

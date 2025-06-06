@@ -1,0 +1,12 @@
+<!-- filepath: c:\dev\django_project\slumSarathi\templates\services\service_form.html -->
+{% extends "base.html" %}
+{% block title %}{% if service %}Edit{% else %}Create{% endif %} Service{% endblock %}
+{% block content %}
+    <h1>{% if service %}Edit{% else %}Create{% endif %} Service</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save</button>
+    </form>
+    <a href="{% url 'services:service_list' %}">Back to List</a>
+{% endblock %}

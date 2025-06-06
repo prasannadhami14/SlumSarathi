@@ -1,10 +1,7 @@
 <!-- filepath: c:\dev\django_project\slumSarathi\templates\accounts\edit_profile.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Profile</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Edit Profile{% endblock %}
+{% block content %}
     <h2>Edit Profile</h2>
     {% if messages %}
         {% for message in messages %}
@@ -39,5 +36,4 @@
         <button type="submit">Save Changes</button>
     </form>
     <a href="{% url 'profile' user_obj.id %}">Back to Profile</a>
-</body>
-</html>
+{% endblock %}

@@ -1,10 +1,7 @@
 <!-- filepath: c:\dev\django_project\slumSarathi\templates\accounts\register.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
     <h2>Register</h2>
     {% if messages %}
         {% for message in messages %}
@@ -30,5 +27,4 @@
         <button type="submit">Register</button>
     </form>
     <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
-</body>
-</html>
+{% endblock %}

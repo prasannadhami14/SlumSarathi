@@ -1,0 +1,12 @@
+<!-- filepath: c:\dev\django_project\slumSarathi\templates\services\service_review_form.html -->
+{% extends "base.html" %}
+{% block title %}Review Service{% endblock %}
+{% block content %}
+    <h1>Review: {{ service.title }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit Review</button>
+    </form>
+    <a href="{% url 'services:service_detail' service.id %}">Back to Service</a>
+{% endblock %}

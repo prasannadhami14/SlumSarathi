@@ -1,0 +1,17 @@
+<!-- filepath: c:\dev\django_project\slumSarathi\templates\services\service_list.html -->
+{% extends "base.html" %}
+{% block title %}Services{% endblock %}
+{% block content %}
+    <h1>All Services</h1>
+    <a href="{% url 'services:service_create' %}">Create New Service</a>
+    <ul>
+        {% for service in services %}
+            <li>
+                <a href="{% url 'services:service_detail' service.id %}">{{ service.title }}</a>
+                ({{ service.get_service_type_display }}, {{ service.display_price }})
+            </li>
+        {% empty %}
+            <li>No services available.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

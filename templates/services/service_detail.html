@@ -1,0 +1,40 @@
+<!-- filepath: c:\dev\django_project\slumSarathi\templates\services\service_detail.html -->
+{% extends "base.html" %}
+{% block title %}{{ service.title }}{% endblock %}
+{% block content %}
+    <h1>{{ service.title }}</h1>
+    <p><strong>Provider:</strong> {{ service.provider.get_full_name }}</p>
+    <p><strong>Type:</strong> {{ service.get_service_type_display }}</p>
+    <p><strong>Category:</strong> {{ service.category }}</p>
+    <p><strong>Description:</strong> {{ service.description }}</p>
+    <p><strong>Price:</strong> {{ service.display_price }}</p>
+    <p><strong>Availability:</strong> {% if service.is_available %}Available{% else %}Not Available{% endif %}</p>
+    <h3>Images</h3>
+    <ul>
+        {% for img in service.images.all %}
+            <li>
+                <img src="{{ img.image.url }}" alt="{{ img.caption }}" width="100">
+                {% if img.is_featured %}<strong>Featured</strong>{% endif %}
+            </li>
+        {% empty %}
+            <li>No images.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'services:service_request_create' service.id %}">Request this Service</a>
+    <h3>Reviews</h3>
+    <ul>
+        {% for review in service.reviews.all %}
+            <li>
+                {{ review.stars }} by {{ review.reviewer.get_full_name }}<br>
+                {{ review.comment }}
+            </li>
+        {% empty %}
+            <li>No reviews yet.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'services:service_review_create' service.id %}">Add Review</a>
+    <br>
+    <a href="{% url 'services:service_edit' service.id %}">Edit</a> |
+    <a href="{% url 'services:service_delete' service.id %}">Delete</a> |
+    <a href="{% url 'services:service_list' %}">Back to List</a>
+{% endblock %}
