@@ -16,7 +16,7 @@
                     <a href="{% url 'register' %}" class="nav-link px-2">Register</a>
                 {% endif %}
                 <form class="d-flex ms-3" method="get" action="{% url 'services:service_list' %}">
-                    <input class="form-control form-control-sm me-2" type="search" name="q" placeholder="Search services..." aria-label="Search">
+                    <input class="form-control form-control-sm me-2" type="search" name="q" placeholder="Search services..." aria-label="Search" value="{{ query|default:'' }}">
                     <button class="btn btn-outline-primary btn-sm" type="submit">Search</button>
                 </form>
             </nav>

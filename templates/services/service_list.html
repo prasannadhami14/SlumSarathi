@@ -6,32 +6,25 @@
 <div class="d-flex justify-content-end mb-3">
     <a href="{% url 'services:service_create' %}" class="btn btn-success">Create New Service</a>
 </div>
-<div class="row g-4 justify-content-center">
-    {% for service in services %}
-        <div class="col-12 col-sm-8 col-md-6 col-lg-4" style="max-width: 320px;">
-            <div class="card h-100 shadow-sm mx-auto" style="width: 100%; min-width: 220px;">
-                {% if service.images.first %}
-                    <img src="{{ service.images.first.image.url }}" class="card-img-top w-100" alt="{{ service.title }}"
-                         style="height:180px; width:100%; object-fit:contain; background:#f8f9fa; border-bottom:1px solid #eee; display:block;">
-                {% else %}
-                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
-                         style="height:180px;">
-                        <span class="text-muted">No Image</span>
-                    </div>
-                {% endif %}
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ service.title }}</h5>
-                    <p class="card-text mb-1"><strong>Type:</strong> {{ service.get_service_type_display }}</p>
-                    <p class="card-text mb-1"><strong>Price:</strong> {{ service.display_price }}</p>
-                    <p class="card-text text-truncate">{{ service.description|truncatechars:80 }}</p>
-                    <a href="{% url 'services:service_detail' service.id %}" class="btn btn-primary mt-auto">View Details</a>
-                </div>
-            </div>
-        </div>
-    {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info text-center">No services available.</div>
-        </div>
-    {% endfor %}
+<div class="row g-4 justify-content-center" id="service-list">
+    {% include "services/_service_list_items.html" %}
 </div>
+<script>
+const searchInput = document.querySelector('input[name="q"]');
+const serviceList = document.getElementById('service-list');
+let timeout = null;
+
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+            fetch(`/services/ajax/search/?q=${encodeURIComponent(searchInput.value)}`)
+                .then(response => response.json())
+                .then(data => {
+                    serviceList.innerHTML = data.html;
+                });
+        }, 300); // debounce for 300ms
+    });
+}
+</script>
 {% endblock %}
