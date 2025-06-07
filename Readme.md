@@ -1,13 +1,10 @@
 # slumSarathi
 
-slumSarathi is a Django-based project designed to [briefly describe the purpose of your project, e.g., "manage and analyze data related to urban slum development"]. This README provides an overview of the project, setup instructions, and the folder structure.
+slumSarathi is a Django-based project designed to connect students to share their talent. This README provides an overview of the project, setup instructions, and the folder structure.
 
 ## Features
 
-- [Feature 1: e.g., User authentication and management]
-- [Feature 2: e.g., Data visualization and reporting]
-- [Feature 3: e.g., RESTful API for data access]
-- [Add more features as needed]
+- [User authentication and management]
 
 ## Getting Started
 
