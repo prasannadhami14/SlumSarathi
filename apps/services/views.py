@@ -7,13 +7,19 @@ from .models import Service, ServiceCategory, ServiceImage, ServiceRequest, Serv
 from .forms import (
     ServiceForm, ServiceImageForm, ServiceRequestForm, ServiceReviewForm
 )
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 def service_list(request):
+    query = request.GET.get('q', '')
     services = Service.objects.filter(is_available=True)
+    if query:
+        services = services.filter(title__icontains=query)
     categories = ServiceCategory.objects.all()
     return render(request, 'services/service_list.html', {
         'services': services,
-        'categories': categories
+        'categories': categories,
+        'query': query,
     })
 
 def service_list_by_category(request, slug):
@@ -209,3 +215,11 @@ def service_review_delete(request, review_id):
     review.delete()
     messages.success(request, _("Review deleted."))
     return redirect('services:service_detail', pk=service_pk)
+
+def ajax_service_search(request):
+    query = request.GET.get('q', '')
+    services = Service.objects.filter(is_available=True)
+    if query:
+        services = services.filter(title__icontains=query)
+    html = render_to_string('services/_service_list_items.html', {'services': services})
+    return JsonResponse({'html': html})

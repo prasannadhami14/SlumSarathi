@@ -30,4 +30,7 @@ urlpatterns = [
     path('service/<uuid:service_id>/review/', views.service_review_create, name='service_review_create'),
     path('review/<int:review_id>/edit/', views.service_review_edit, name='service_review_edit'),
     path('review/<int:review_id>/delete/', views.service_review_delete, name='service_review_delete'),
+
+    # AJAX URLs
+    path('ajax/search/', views.ajax_service_search, name='ajax_service_search'),
 ]
