@@ -134,64 +134,33 @@ button:focus, input[type="submit"]:focus, input[type="button"]:focus {
 }
 
 form {
-    margin: 2em 0 1.5em 0;
-    text-align: center;
+    margin: 2em auto 1.5em auto;
+    max-width: 500px;
+    padding: 2em 2em 1em 2em;
+    background: #f9fbfd;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-input, select, textarea {
+form label {
     width: 100%;
-    padding: 0.7em;
-    margin: 0.3em 0 1.2em 0;
-    border: 1px solid #bfc9d1;
-    border-radius: 5px;
+    text-align: left;
+    margin-bottom: 0.3em;
     font-size: 1.08em;
-    font-family: inherit;
-    background: #f7fafd;
-    transition: border 0.2s;
-    text-align: left;
 }
 
-input:focus, select:focus, textarea:focus {
-    border: 1.5px solid #00509e;
-    outline: none;
-    background: #fff;
+form input, form select, form textarea {
+    width: 100%;
+    margin-bottom: 1.2em;
 }
 
-label {
-    font-weight: 500;
-    color: #003366;
-    margin-bottom: 0.2em;
-    display: block;
-    text-align: left;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-    text-align: left;
-}
-
-ul li {
-    margin-bottom: 1.1em;
-    padding: 0.7em 1em;
-    background: #f1f1f1;
-    border-radius: 6px;
-    font-size: 1.08em;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-}
-
-footer {
-    margin-top: 2em;
-    font-size: 1.1em;
-    letter-spacing: 0.02em;
-    background: linear-gradient(90deg, #003366 80%, #00509e 100%);
-    text-align: center;
-}
-
-hr {
-    border: none;
-    border-top: 1.5px solid #e0e7ef;
-    margin: 1.5em 0;
+form button, form input[type="submit"] {
+    align-self: center;
+    min-width: 120px;
 }
 
 @media (max-width: 600px) {
@@ -213,4 +182,20 @@ hr {
         font-size: 1em;
         padding: 0.7em 1.2em;
     }
+    form {
+        padding: 1em 0.5em;
+        max-width: 98vw;
+    }
+}
+.stars {
+  color: #ffc107;   /* yellow */
+}
+
+.star-empty {
+  color: #ddd;     /* gray */
+}
+
+.stars, .star-empty {
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
 }
