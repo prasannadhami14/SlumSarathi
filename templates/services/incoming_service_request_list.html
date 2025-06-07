@@ -1,0 +1,58 @@
+<!-- filepath: c:\dev\django_project\slumSarathi\templates\services\incoming_service_request_list.html -->
+{% extends "base.html" %}
+{% block title %}Incoming Service Requests{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4 text-center">Incoming Service Requests</h2>
+    {% if requests %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Service</th>
+                        <th>Requester</th>
+                        <th>Message</th>
+                        <th>Proposed Rate</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for req in requests %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'services:service_detail' req.service.id %}">
+                                {{ req.service.title }}
+                            </a>
+                        </td>
+                        <td>{{ req.requester.get_full_name|default:req.requester.email }}</td>
+                        <td>{{ req.message }}</td>
+                        <td>{{ req.proposed_rate }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if req.status == 'pending' %}bg-warning
+                                {% elif req.status == 'accepted' %}bg-success
+                                {% elif req.status == 'rejected' %}bg-danger
+                                {% elif req.status == 'cancelled' %}bg-secondary
+                                {% else %}bg-light text-dark{% endif %}">
+                                {{ req.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if req.status == 'pending' %}
+                                <a href="{% url 'services:service_request_accept' req.id %}" class="btn btn-sm btn-success">Accept</a>
+                                <a href="{% url 'services:service_request_reject' req.id %}" class="btn btn-sm btn-danger ms-1">Reject</a>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">No incoming service requests.</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -2,11 +2,28 @@
 {% extends "base.html" %}
 {% block title %}Request Service{% endblock %}
 {% block content %}
-    <h1>Request: {{ service.title }}</h1>
-    <form method="post">
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+  <div class="w-100" style="max-width: 500px;">
+    <div class="card shadow-sm p-4">
+      <h2 class="mb-4 text-center">Request: {{ service.title }}</h2>
+      <form method="post" action="{% url 'services:service_request_create' service.id %}">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Send Request</button>
-    </form>
-    <a href="{% url 'services:service_detail' service.id %}">Back to Service</a>
+        {% for field in form %}
+          <div class="mb-3">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}
+              <div class="form-text">{{ field.help_text }}</div>
+            {% endif %}
+            {% for error in field.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary w-100">Send Request</button>
+      </form>
+      <a href="{% url 'services:service_detail' service.id %}" class="btn btn-link mt-3 w-100">Back to Service</a>
+    </div>
+  </div>
+</div>
 {% endblock %}

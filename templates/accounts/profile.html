@@ -2,20 +2,36 @@
 {% extends "base.html" %}
 {% block title %}Profile{% endblock %}
 {% block content %}
-    <h2>Profile</h2>
-    <p><strong>Email:</strong> {{ user_obj.email }}</p>
-    <p><strong>First Name:</strong> {{ user_obj.first_name }}</p>
-    <p><strong>Last Name:</strong> {{ user_obj.last_name }}</p>
-    <p><strong>User Type:</strong> {{ user_obj.get_user_type_display }}</p>
-    {% if profile %}
-        <p><strong>Phone Number:</strong> {{ profile.phone_number }}</p>
-        <p><strong>Gender:</strong> {{ profile.get_gender_display }}</p>
-        <p><strong>Bio:</strong> {{ profile.bio }}</p>
-        <p><strong>Institution:</strong> {{ profile.institution }}</p>
-        <p><strong>Course of Study:</strong> {{ profile.course_of_study }}</p>
-        <p><strong>Organization:</strong> {{ profile.organization }}</p>
-        <p><strong>Website:</strong> <a href="{{ profile.website }}">{{ profile.website }}</a></p>
-    {% endif %}
-    <a href="{% url 'edit_profile' user_obj.id %}">Edit Profile</a> |
-    <a href="{% url 'logout' %}">Logout</a>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+  <div class="w-100" style="max-width: 540px;">
+    <div class="card shadow-sm p-4">
+      <h2 class="mb-4 text-center">Profile</h2>
+      <ul class="list-group list-group-flush mb-3">
+        <li class="list-group-item"><strong>Email:</strong> {{ user_obj.email }}</li>
+        <li class="list-group-item"><strong>First Name:</strong> {{ user_obj.first_name }}</li>
+        <li class="list-group-item"><strong>Last Name:</strong> {{ user_obj.last_name }}</li>
+        <li class="list-group-item"><strong>User Type:</strong> {{ user_obj.get_user_type_display }}</li>
+        {% if profile %}
+          <li class="list-group-item"><strong>Phone Number:</strong> {{ profile.phone_number }}</li>
+          <li class="list-group-item"><strong>Gender:</strong> {{ profile.get_gender_display }}</li>
+          <li class="list-group-item"><strong>Bio:</strong> {{ profile.bio }}</li>
+          <li class="list-group-item"><strong>Institution:</strong> {{ profile.institution }}</li>
+          <li class="list-group-item"><strong>Course of Study:</strong> {{ profile.course_of_study }}</li>
+          <li class="list-group-item"><strong>Organization:</strong> {{ profile.organization }}</li>
+          <li class="list-group-item"><strong>Website:</strong>
+            {% if profile.website %}
+              <a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a>
+            {% else %}
+              <span class="text-muted">N/A</span>
+            {% endif %}
+          </li>
+        {% endif %}
+      </ul>
+      <div class="d-flex justify-content-between">
+        <a href="{% url 'edit_profile' user_obj.id %}" class="btn btn-primary w-50 me-2">Edit Profile</a>
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger w-50 ms-2">Logout</a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

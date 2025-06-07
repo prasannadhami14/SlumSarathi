@@ -1,15 +1,26 @@
 <!-- filepath: c:\dev\django_project\slumSarathi\templates\header.html -->
-<header>
-    <h1><a href="{% url 'homepage' %}">SlumSarathi</a></h1>
-    <nav>
-        <a href="{% url 'services:service_list' %}">Services</a>
-        {% if user.is_authenticated %}
-            <a href="{% url 'profile' user.id %}">Profile</a>
-            <a href="{% url 'logout' %}">Logout</a>
-        {% else %}
-            <a href="{% url 'login' %}">Login</a>
-            <a href="{% url 'register' %}">Register</a>
-        {% endif %}
-    </nav>
+<header class="mb-4">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between py-2">
+            <h1 class="mb-2 mb-md-0">
+                <a href="{% url 'homepage' %}" class="text-decoration-none text-primary fw-bold" style="font-size:2.2rem;">SlumSarathi</a>
+            </h1>
+            <nav class="d-flex align-items-center gap-3">
+                <a href="{% url 'services:service_list' %}" class="nav-link px-2">Services</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' user.id %}" class="nav-link px-2">Profile</a>
+                    <a href="{% url 'services:incoming_service_requests' %}" class="nav-link px-2">Incoming Requests</a>
+                    <a href="{% url 'logout' %}" class="nav-link px-2">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-link px-2">Login</a>
+                    <a href="{% url 'register' %}" class="nav-link px-2">Register</a>
+                {% endif %}
+                <form class="d-flex ms-3" method="get" action="{% url 'services:service_list' %}">
+                    <input class="form-control form-control-sm me-2" type="search" name="q" placeholder="Search services..." aria-label="Search">
+                    <button class="btn btn-outline-primary btn-sm" type="submit">Search</button>
+                </form>
+            </nav>
+        </div>
+    </div>
     <hr>
 </header>

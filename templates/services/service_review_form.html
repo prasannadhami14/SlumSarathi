@@ -2,11 +2,60 @@
 {% extends "base.html" %}
 {% block title %}Review Service{% endblock %}
 {% block content %}
-    <h1>Review: {{ service.title }}</h1>
-    <form method="post">
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+  <div class="w-100" style="max-width: 500px;">
+    <div class="card shadow-sm p-4">
+      <h2 class="mb-4 text-center">Review: {{ service.title }}</h2>
+      <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Submit Review</button>
-    </form>
-    <a href="{% url 'services:service_detail' service.id %}">Back to Service</a>
+        <div class="mb-3">
+          <label class="form-label">Rating:</label>
+          <div class="star-rating">
+            {% for value, label in form.fields.rating.choices reversed %}
+              <input type="radio" name="rating" id="star{{ value }}" value="{{ value }}" {% if form.rating.value|stringformat:"s" == value|stringformat:"s" %}checked{% endif %}>
+              <label for="star{{ value }}" title="{{ label }}">
+                &#9733;
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="mb-3">
+          {{ form.comment.label_tag }}
+          {{ form.comment }}
+          {% if form.comment.help_text %}
+            <div class="form-text">{{ form.comment.help_text }}</div>
+          {% endif %}
+          {% for error in form.comment.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Submit Review</button>
+      </form>
+      <a href="{% url 'services:service_detail' service.id %}" class="btn btn-link mt-3 w-100">Back to Service</a>
+    </div>
+  </div>
+</div>
+
+<style>
+.star-rating {
+  direction: rtl;
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.2em;
+  font-size: 2rem;
+}
+.star-rating input[type="radio"] {
+  display: none;
+}
+.star-rating label {
+  color: #ddd;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.star-rating input[type="radio"]:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+  color: #ffc107;
+}
+</style>
 {% endblock %}
