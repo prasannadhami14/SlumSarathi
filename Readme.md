@@ -95,8 +95,7 @@ slumSarathi/
 
 ## License
 
-[Specify your license here, e.g., MIT License]
 
 ## Contact
 
-For questions or support, contact [your-email@example.com].
+For questions or support, contact prashannadhami14@gmail.com
