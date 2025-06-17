@@ -37,6 +37,8 @@ INSTALLED_APPS = [
 REQUIRED_APPS = [
     'accounts',
     'services',
+    'resources',
+    'events',
 ]
 INSTALLED_APPS += REQUIRED_APPS
 
