@@ -52,7 +52,6 @@ class User(AbstractUser):
     USER_TYPE_CHOICES = (
         (1, 'Student'),
         (2, 'Event Organizer'),
-        (3, 'Admin'),
     )
     
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, default=1)
