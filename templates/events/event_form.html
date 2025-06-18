@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}{% if form.instance.pk %}Edit Event{% else %}Create Event{% endif %}{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4 text-center">{% if form.instance.pk %}Edit Event{% else %}Create Event{% endif %}</h2>
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body" style="max-height: 75vh; overflow-y: auto;">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        {% for field in form %}
+                            <div class="mb-3">
+                                {{ field.label_tag }}
+                                {% if field.errors %}
+                                    {{ field|add_class:"form-control is-invalid" }}
+                                {% else %}
+                                    {{ field|add_class:"form-control" }}
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Save Changes{% else %}Create Event{% endif %}</button>
+                            <a href="{% url 'events:event_list' %}" class="btn btn-secondary ms-2">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

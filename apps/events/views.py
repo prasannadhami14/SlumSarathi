@@ -1,10 +1,13 @@
 # events/views.py
-from django.views.generic import ListView, DetailView
-from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Event, EventRegistration
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
-from . import models
 from django.http import HttpResponseForbidden
+from . import models
+from .forms import EventForm
 
 class EventListView(ListView):
     model = Event
@@ -45,6 +48,35 @@ class EventDetailView(DetailView):
                 user=self.request.user
             ).exists()
         return context
+
+class OrganizerRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        event = self.get_object()
+        return self.request.user == event.organizer
+
+class EventCreateView(LoginRequiredMixin, CreateView):
+    model = Event
+    template_name = 'events/event_form.html'
+    form_class = EventForm
+
+    def form_valid(self, form):
+        form.instance.organizer = self.request.user
+        return super().form_valid(form)
+
+class EventUpdateView(LoginRequiredMixin, OrganizerRequiredMixin, UpdateView):
+    model = Event
+    template_name = 'events/event_form.html'
+    fields = [
+        'title', 'slug', 'description', 'event_type', 'category',
+        'start_datetime', 'end_datetime', 'registration_deadline',
+        'venue_name', 'address', 'city', 'state', 'country', 'online_link',
+        'capacity', 'is_free', 'price', 'featured_image'
+    ]
+
+class EventDeleteView(LoginRequiredMixin, OrganizerRequiredMixin, DeleteView):
+    model = Event
+    template_name = 'events/event_confirm_delete.html'
+    success_url = reverse_lazy('event_list')
 
 def register_for_event(request, slug):
     event = get_object_or_404(Event, slug=slug, status='published')
