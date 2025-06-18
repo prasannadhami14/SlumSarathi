@@ -3,6 +3,7 @@ from django.core.validators import FileExtensionValidator
 from django.utils.translation import gettext_lazy as _
 from accounts.models import User
 from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 import uuid
 import os
 
@@ -127,6 +128,12 @@ class Resource(models.Model):
     
     def save(self, *args, **kwargs):
         """Calculate file size before saving"""
+        if not self.slug:
+            base_slug = slugify(self.title)
+            unique_slug = base_slug
+            while Resource.objects.filter(slug=unique_slug).exclude(pk=self.pk).exists():
+                unique_slug = f"{base_slug}-{uuid.uuid4().hex[:6]}"
+            self.slug = unique_slug
         if self.file:
             self.file_size = self.file.size
         super().save(*args, **kwargs)

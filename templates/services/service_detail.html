@@ -58,8 +58,10 @@
                     </ul>
                     <a href="{% url 'services:service_review_create' service.id %}" class="btn btn-outline-success mb-2">Add Review</a>
                     <div class="mt-4">
-                        <a href="{% url 'services:service_edit' service.id %}" class="btn btn-secondary me-2">Edit</a>
-                        <a href="{% url 'services:service_delete' service.id %}" class="btn btn-danger me-2">Delete</a>
+                        {% if user.is_authenticated and user == service.provider %}
+                            <a href="{% url 'services:service_edit' service.id %}" class="btn btn-secondary me-2">Edit</a>
+                            <a href="{% url 'services:service_delete' service.id %}" class="btn btn-danger me-2">Delete</a>
+                        {% endif %}
                         <a href="{% url 'services:service_list' %}" class="btn btn-link">Back to List</a>
                     </div>
                 </div>

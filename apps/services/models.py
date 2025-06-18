@@ -24,7 +24,6 @@ class Service(models.Model):
     """Model for student services being offered"""
     SERVICE_TYPES = (
         ('teaching', _('Teaching/Tutoring')),
-        ('assignment', _('Assignment Help')),
         ('consulting', _('Academic Consulting')),
         ('other', _('Other Service')),
     )

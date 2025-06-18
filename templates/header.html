@@ -1,26 +1,61 @@
-<!-- filepath: c:\dev\django_project\slumSarathi\templates\header.html -->
+{% load static %}
 <header class="mb-4">
-    <div class="container">
-        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between py-2">
-            <h1 class="mb-2 mb-md-0">
-                <a href="{% url 'homepage' %}" class="text-decoration-none text-primary fw-bold" style="font-size:2.2rem;">SlumSarathi</a>
-            </h1>
-            <nav class="d-flex align-items-center gap-3">
-                <a href="{% url 'services:service_list' %}" class="nav-link px-2">Services</a>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'profile' user.id %}" class="nav-link px-2">Profile</a>
-                    <a href="{% url 'services:incoming_service_requests' %}" class="nav-link px-2">Incoming Requests</a>
-                    <a href="{% url 'logout' %}" class="nav-link px-2">Logout</a>
-                {% else %}
-                    <a href="{% url 'login' %}" class="nav-link px-2">Login</a>
-                    <a href="{% url 'register' %}" class="nav-link px-2">Register</a>
-                {% endif %}
-                <form class="d-flex ms-3" method="get" action="{% url 'services:service_list' %}">
-                    <input class="form-control form-control-sm me-2" type="search" name="q" placeholder="Search services..." aria-label="Search" value="{{ query|default:'' }}">
-                    <button class="btn btn-outline-primary btn-sm" type="submit">Search</button>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom border-2 fixed-top" style="border-color: #0d6efd !important;">
+        <div class="container-fluid ">
+            <a href="{% url 'homepage' %}" class="navbar-brand d-flex align-items-center">
+                <img src="{% static 'img/logo.jpg' %}" alt="SlumSarathi Logo" height="80" width="80" style="object-fit:contain;border-radius: 50%;">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2 me-3">
+                    <li class="nav-item">
+                        <a href="{% url 'services:service_list' %}" class="nav-link fw-semibold">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'resources:resource_list' %}" class="nav-link fw-semibold">Resources</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link fw-semibold">Events</a>
+                    </li>
+                </ul>
+                <form class="d-flex mb-2 mb-lg-0 me-lg-3" method="get" action="{% url 'services:service_list' %}">
+                    <input class="form-control form-control-md me-2" type="search" name="q" placeholder="Search services..." aria-label="Search" value="{{ query|default:'' }}">
                 </form>
-            </nav>
+                {% if user.is_authenticated %}
+                <div class="dropdown ms-lg-2">
+                    <a class="nav-link dropdown-toggle p-0 d-flex align-items-center"
+                       href="#" id="profileDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false" style="border: none; background: none;">
+                        <img src="{% static 'img/profile.jpeg' %}" alt="Profile" width="40" height="40"
+                             class="rounded-circle border" style="object-fit:cover;">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'profile' user.id %}">My Profile</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'services:incoming_service_requests' %}">Incoming Requests</a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+                {% else %}
+                <ul class="navbar-nav mb-2 mb-lg-0 ms-lg-2">
+                    <li class="nav-item">
+                        <a href="{% url 'login' %}" class="nav-link">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'register' %}" class="nav-link">Register</a>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
         </div>
-    </div>
-    <hr>
+    </nav>
+    <hr class="m-0">
 </header>

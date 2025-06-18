@@ -7,7 +7,7 @@ class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
         fields = [
-            'title', 'slug', 'description', 'service_type', 'category',
+            'title', 'slug', 'description', 'service_type',
             'pricing_model', 'rate', 'is_available', 'available_from', 'available_to'
         ]
         widgets = {
@@ -15,7 +15,7 @@ class ServiceForm(forms.ModelForm):
             'slug': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'service-title', 'readonly': True}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Describe your service...', 'rows': 4}),
             'service_type': forms.Select(attrs={'class': 'form-select'}),
-            'category': forms.Select(attrs={'class': 'form-select'}),
+            # 'category': forms.Select(attrs={'class': 'form-select'}),
             'pricing_model': forms.Select(attrs={'class': 'form-select'}),
             'rate': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter rate'}),
             'is_available': forms.CheckboxInput(attrs={'class': 'form-check-input'}),

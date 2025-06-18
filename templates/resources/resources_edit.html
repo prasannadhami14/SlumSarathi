@@ -1,0 +1,84 @@
+<!-- filepath: c:\dev\django_project\slumSarathi\templates\resources\resources_edit.html -->
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Edit Resource{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm p-4">
+                <h2 class="mb-4 text-center">Edit Resource</h2>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="mb-3">
+                        {{ form.title.label_tag }}
+                        {{ form.title|add_class:"form-control" }}
+                        {% for error in form.title.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.description.label_tag }}
+                        {{ form.description|add_class:"form-control" }}
+                        {% for error in form.description.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.file.label_tag }}
+                        {{ form.file|add_class:"form-control" }}
+                        {% for error in form.file.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.resource_type.label_tag }}
+                        {{ form.resource_type|add_class:"form-select" }}
+                        {% for error in form.resource_type.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.course_name.label_tag }}
+                        {{ form.course_name|add_class:"form-control" }}
+                        {% for error in form.course_name.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.institution.label_tag }}
+                        {{ form.institution|add_class:"form-control" }}
+                        {% for error in form.institution.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.year.label_tag }}
+                        {{ form.year|add_class:"form-control" }}
+                        {% for error in form.year.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.license_type.label_tag }}
+                        {{ form.license_type|add_class:"form-select" }}
+                        {% for error in form.license_type.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.thumbnail.label_tag }}
+                        {{ form.thumbnail|add_class:"form-control" }}
+                        {% for error in form.thumbnail.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <!-- Add other fields as needed -->
+                    <button class="btn btn-primary w-100" type="submit">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
