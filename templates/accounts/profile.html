@@ -17,14 +17,16 @@
           <li class="list-group-item"><strong>Bio:</strong> {{ profile.bio }}</li>
           <li class="list-group-item"><strong>Institution:</strong> {{ profile.institution }}</li>
           <li class="list-group-item"><strong>Course of Study:</strong> {{ profile.course_of_study }}</li>
-          <li class="list-group-item"><strong>Organization:</strong> {{ profile.organization }}</li>
-          <li class="list-group-item"><strong>Website:</strong>
+          {% if profile.get_user_type_display == "Event Organizer" %}
+            <li class="list-group-item"><strong>Organization:</strong> {{ profile.organization }}</li>
+            <li class="list-group-item"><strong>Website:</strong>
             {% if profile.website %}
               <a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a>
             {% else %}
               <span class="text-muted">N/A</span>
             {% endif %}
           </li>
+        {% endif %}
         {% endif %}
       </ul>
       <div class="d-flex justify-content-between">

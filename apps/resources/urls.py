@@ -1,7 +1,8 @@
 # resources/urls.py
 from django.urls import path
 from .views import (
-    ResourceListView, ResourceDetailView, ResourceUploadView, download_resource,ResourceEditView
+    ResourceListView, ResourceDetailView, ResourceUploadView, download_resource,ResourceEditView,
+    ResourceDeleteView
 )
 
 app_name = "resources"
@@ -12,5 +13,7 @@ urlpatterns = [
     path('<uuid:pk>/', ResourceDetailView.as_view(), name='resource_detail'),
     path('<uuid:pk>/download/', download_resource, name='resource_download'),
     path('<uuid:pk>/edit/', ResourceEditView.as_view(), name='resource_edit'),
+    path('<uuid:pk>/delete/', ResourceDeleteView.as_view(), name='resource_delete'),
+
 
 ]

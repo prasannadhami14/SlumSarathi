@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Delete Resource{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <div class="alert alert-danger text-center">
+        <h2>Are you sure you want to delete this resource?</h2>
+        <p><strong>{{ resource.title }}</strong></p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a href="{% url 'resources:resource_detail' resource.pk %}" class="btn btn-secondary ms-2">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

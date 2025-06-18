@@ -46,6 +46,7 @@
           <label class="form-label">Course of Study:</label>
           <input type="text" name="course_of_study" value="{{ profile.course_of_study }}" class="form-control">
         </div>
+         {% if profile.get_user_type_display == "Event Organizer" %}
         <div class="mb-3">
           <label class="form-label">Organization:</label>
           <input type="text" name="organization" value="{{ profile.organization }}" class="form-control">
@@ -54,6 +55,7 @@
           <label class="form-label">Website:</label>
           <input type="url" name="website" value="{{ profile.website }}" class="form-control">
         </div>
+         {% endif %}
         <button type="submit" class="btn btn-primary w-100">Save Changes</button>
       </form>
       <a href="{% url 'profile' user_obj.id %}" class="btn btn-link mt-3 w-100">Back to Profile</a>

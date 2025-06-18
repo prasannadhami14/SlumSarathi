@@ -19,12 +19,13 @@
                 <li><strong>Views:</strong> {{ resource.views }}</li>
             </ul>
             {% if resource.allow_download %}
-                <a href="{% url 'resources:resource_download' resource.pk %}" class="btn btn-primary mb-3">Download PDF</a>
+                <a href="{% url 'resources:resource_download' resource.pk %}" class="btn btn-primary mb-3 me-2">Download PDF</a>
             {% else %}
                 <div class="alert alert-warning">Download not allowed for this resource.</div>
             {% endif %}
-            {% if user == resource.uploader %}
-                <a href="{% url 'resources:resource_edit' resource.pk %}" class="btn btn-warning mb-3">Edit Resource</a>
+            {% if user.is_authenticated and user == resource.uploader %}
+                <a href="{% url 'resources:resource_edit' resource.pk %}" class="btn btn-warning me-2 mb-3">Edit</a>
+                <a href="{% url 'resources:resource_delete' resource.pk %}" class="btn btn-danger mb-3">Delete</a>
             {% endif %}
             <hr>
             <h5>Comments</h5>

@@ -134,3 +134,15 @@ class ResourceEditView(View):
             messages.success(request, "Resource updated successfully!")
             return redirect('resources:resource_detail', pk=resource.pk)
         return render(request, 'resources/resources_edit.html', {'form': form, 'resource': resource})
+
+@method_decorator(login_required, name='dispatch')
+class ResourceDeleteView(View):
+    def get(self, request, pk):
+        resource = get_object_or_404(Resource, pk=pk, uploader=request.user)
+        return render(request, 'resources/resource_confirm_delete.html', {'resource': resource})
+
+    def post(self, request, pk):
+        resource = get_object_or_404(Resource, pk=pk, uploader=request.user)
+        resource.delete()
+        messages.success(request, "Resource deleted successfully!")
+        return redirect('resources:resource_list')
