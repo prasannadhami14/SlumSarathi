@@ -1,6 +1,8 @@
-<!-- filepath: c:\dev\django_project\slumSarathi\templates\services\service_form.html -->
 {% extends "base.html" %}
+{% load widget_tweaks %}
+
 {% block title %}Create Service{% endblock %}
+
 {% block content %}
 <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
   <div class="w-100" style="max-width: 540px;">
@@ -15,8 +17,15 @@
               <h5 class="mt-4 mb-2">Details</h5>
             {% endif %}
             <div class="mb-3">
-              {{ field.label_tag }} 
-              {{ field }}
+              {{ field.label_tag }}
+              {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+              {% if field.field.widget.input_type == 'select' %}
+                {{ field|add_class:"form-select" }}
+              {% elif field.field.widget.input_type == 'file' %}
+                {{ field|add_class:"form-control" }}
+              {% else %}
+                {{ field|add_class:"form-control" }}
+              {% endif %}
               {% if field.help_text %}
                 <div class="form-text">{{ field.help_text }}</div>
               {% endif %}
