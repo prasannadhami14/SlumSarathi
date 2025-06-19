@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Registrations for {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            <a href="{% url 'events:event_detail' event.slug %}" class="text-decoration-none">
+                {{ event.title }}
+            </a>
+            <small class="text-muted">Registrations</small>
+        </h2>
+        <div>
+            <a href="{% url 'events:event_detail' event.slug %}" class="btn btn-outline-secondary">
+                Back to Event
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Registration List</h5>
+            <span class="badge bg-primary">
+                Total: {{ registrations.count }}
+                {% if event.capacity %} (Capacity: {{ event.capacity }}){% endif %}
+            </span>
+        </div>
+        
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Attendee</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Registered On</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for registration in registrations %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ registration.user.get_full_name|default:registration.user.username }}</td>
+                            <td>{{ registration.user.email }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if registration.status == 'registered' %}bg-success
+                                    {% elif registration.status == 'waitlisted' %}bg-warning text-dark
+                                    {% else %}bg-secondary{% endif %}">
+                                    {{ registration.get_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ registration.registration_date|date:"M d, Y H:i" }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="mailto:{{ registration.user.email }}" 
+                                       class="btn btn-outline-primary" title="Email">
+                                        <i class="bi bi-envelope"></i>
+                                    </a>
+                                    {% if registration.status == 'waitlisted' and event.available_seats > 0 %}
+                                        <form method="post" action="{% url 'events:promote_attendee' registration.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-outline-success" title="Promote to registered">
+                                                <i class="bi bi-arrow-up"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    <form method="post" action="{% url 'events:remove_registration' registration.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger" title="Remove">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <div class="alert alert-info mb-0">
+                                    No registrations yet
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        {% if registrations %}
+        <div class="card-footer text-muted">
+            <small>Showing {{ registrations.count }} registration(s)</small>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

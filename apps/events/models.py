@@ -5,6 +5,8 @@ from accounts.models import User
 import uuid
 from datetime import datetime
 from django.urls import reverse
+from django.utils.text import slugify
+from django.utils import timezone
 
 class EventCategory(models.Model):
     """Categories for organizing events"""
@@ -44,7 +46,7 @@ class Event(models.Model):
         limit_choices_to={'user_type': 2}  # Only organizers can create events
     )
     title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200, unique=True)
+    slug = models.SlugField(unique=True, blank=True)
     description = models.TextField()
     event_type = models.CharField(max_length=10, choices=EVENT_TYPES)
     category = models.ForeignKey(
@@ -102,15 +104,25 @@ class Event(models.Model):
     def __str__(self):
         return f"{self.title} ({self.get_event_type_display()})"
     
-    def get_absolute_url(self):
-        return reverse('event_detail', kwargs={'slug': self.slug})
-    
     def save(self, *args, **kwargs):
-        """Ensure price consistency"""
+        """Ensure price consistency and proper slug generation"""
         if self.is_free:
             self.price = None
+        
+        # Generate slug only if it's empty
+        if not self.slug:
+            base_slug = slugify(self.title)
+            if self.start_datetime:
+                date_str = self.start_datetime.strftime('%Y-%m-%d')
+                base_slug = f"{base_slug}-{date_str}"
+            
+            self.slug = base_slug
+            counter = 1
+            while Event.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+                self.slug = f"{base_slug}-{counter}"
+                counter += 1
+        
         super().save(*args, **kwargs)
-    
     @property
     def is_upcoming(self):
         """Check if event is in the future"""
@@ -123,10 +135,12 @@ class Event(models.Model):
     
     @property
     def registration_open(self):
-        """Check if registration is still open"""
-        if self.registration_deadline:
-            return self.registration_deadline > datetime.now()
-        return self.is_upcoming
+        now = timezone.now()
+        deadline = self.registration_deadline
+        # If deadline is naive, make it aware
+        if deadline is not None and timezone.is_naive(deadline):
+            deadline = timezone.make_aware(deadline, timezone.get_current_timezone())
+        return deadline is not None and now < deadline
     
     @property
     def available_seats(self):
