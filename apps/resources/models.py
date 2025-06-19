@@ -6,7 +6,9 @@ from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 import uuid
 import os
-
+from io import BytesIO
+from PIL import Image as PILImage
+import PyPDF2
 def validate_pdf_file(value):
     """Custom validator to ensure only PDF files are uploaded"""
     ext = os.path.splitext(value.name)[1].lower()
@@ -25,25 +27,24 @@ class ResourceCategory(models.Model):
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     icon = models.CharField(max_length=50, blank=True)
-    
+
     class Meta:
         verbose_name = _('resource category')
         verbose_name_plural = _('resource categories')
         ordering = ['name']
-    
+
     def __str__(self):
         return self.name
-    
+
 class Resource(models.Model):
     """Main model for notes, assignments, and books"""
     RESOURCE_TYPES = (
         ('note', 'Lecture Note'),
-        ('assignment', 'Assignment'),
         ('book', 'Book/Textbook'),
         ('exam', 'Exam Paper'),
         ('other', 'Other'),
     )
-    
+
     LICENSE_TYPES = (
         ('public', 'Public Domain'),
         ('cc-by', 'CC BY'),
@@ -51,7 +52,7 @@ class Resource(models.Model):
         ('cc-by-nc', 'CC BY-NC'),
         ('copyright', 'All Rights Reserved'),
     )
-    
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     uploader = models.ForeignKey(
         User,
@@ -68,7 +69,7 @@ class Resource(models.Model):
         null=True,
         blank=True,
         related_name='resources'
-    )    
+    )
     file = models.FileField(
         upload_to=resource_file_path,
         validators=[
@@ -83,7 +84,7 @@ class Resource(models.Model):
         blank=True
     )
     file_size = models.PositiveIntegerField(editable=False)  # in bytes
-    
+
     # Licensing and sharing
     license_type = models.CharField(
         max_length=20,
@@ -93,25 +94,25 @@ class Resource(models.Model):
     is_free = models.BooleanField(default=True)
     allow_download = models.BooleanField(default=True)
     allow_comments = models.BooleanField(default=True)
-    
+
     # Academic metadata
     course_code = models.CharField(max_length=20, blank=True)
     course_name = models.CharField(max_length=100, blank=True)
     institution = models.CharField(max_length=100, blank=True)
     year = models.PositiveIntegerField(null=True, blank=True)
-    
+
     # Statistics
     downloads = models.PositiveIntegerField(default=0)
     views = models.PositiveIntegerField(default=0)
-    
+
     # Moderation
     is_approved = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
-    
+
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         verbose_name = _('resource')
         verbose_name_plural = _('resources')
@@ -122,46 +123,76 @@ class Resource(models.Model):
             models.Index(fields=['course_code']),
             models.Index(fields=['is_approved']),
         ]
-    
+
     def __str__(self):
         return f"{self.title} ({self.get_resource_type_display()})"
-    
+
+    def create_pdf_thumbnail(pdf_file):
+        try:
+            # Create PDF reader
+            pdf_reader = PyPDF2.PdfFileReader(pdf_file)
+
+            # Get first page
+            first_page = pdf_reader.getPage(0)
+
+            # Create blank image (fallback)
+            img = PILImage.new('RGB', (600, 400), color=(220, 220, 220))
+
+            # Save to BytesIO
+            thumb_io = BytesIO()
+            img.save(thumb_io, format='PNG')
+            return thumb_io.getvalue()
+        except Exception as e:
+            print(f"Thumbnail generation failed: {e}")
+            return None
+
     def save(self, *args, **kwargs):
-        """Calculate file size before saving"""
         if not self.slug:
             base_slug = slugify(self.title)
             unique_slug = base_slug
             while Resource.objects.filter(slug=unique_slug).exclude(pk=self.pk).exists():
                 unique_slug = f"{base_slug}-{uuid.uuid4().hex[:6]}"
             self.slug = unique_slug
+
         if self.file:
             self.file_size = self.file.size
+
+            if not self.thumbnail and self.file.name.lower().endswith('.pdf'):
+                try:
+                    # Reset file pointer
+                    self.file.seek(0)
+                    thumb_data = create_pdf_thumbnail(self.file)
+                    if thumb_data:
+                        thumb_name = f"{uuid.uuid4()}.png"
+                        self.thumbnail.save(thumb_name, ContentFile(thumb_data), save=False)
+                except Exception as e:
+                    print(f"Thumbnail generation failed: {e}")
+
         super().save(*args, **kwargs)
-    
     def get_file_extension(self):
         """Get the file extension in lowercase"""
         if self.file:
             return self.file.name.split('.')[-1].lower()
         return None
-    
+
     @property
     def file_size_mb(self):
         """Return file size in MB"""
         if self.file_size:
             return round(self.file_size / (1024 * 1024), 2)
         return 0
-    
+
     @property
     def download_url(self):
         """Generate download URL with tracking"""
         from django.urls import reverse
         return reverse('resource_download', kwargs={'pk': self.id})
-    
+
     def increment_download(self):
         """Increment download counter"""
         self.downloads += 1
         self.save(update_fields=['downloads'])
-    
+
     def increment_view(self):
         """Increment view counter"""
         self.views += 1
@@ -184,12 +215,12 @@ class ResourceDownload(models.Model):
     user_agent = models.TextField(blank=True)
     referrer = models.URLField(blank=True)
     downloaded_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         verbose_name = _('resource download')
         verbose_name_plural = _('resource downloads')
         ordering = ['-downloaded_at']
-    
+
     def __str__(self):
         return f"Download of {self.resource.title} at {self.downloaded_at}"
 
@@ -209,12 +240,12 @@ class ResourceComment(models.Model):
     is_approved = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         verbose_name = _('resource comment')
         verbose_name_plural = _('resource comments')
         ordering = ['created_at']
-    
+
     def __str__(self):
         return f"Comment by {self.user.email} on {self.resource.title}"
 
@@ -227,7 +258,7 @@ class ResourceRating(models.Model):
         (4, '★★★★☆ - Very Good'),
         (5, '★★★★★ - Excellent'),
     ]
-    
+
     resource = models.ForeignKey(
         Resource,
         on_delete=models.CASCADE,
@@ -241,16 +272,16 @@ class ResourceRating(models.Model):
     rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         verbose_name = _('resource rating')
         verbose_name_plural = _('resource ratings')
         unique_together = ('resource', 'user')
         ordering = ['-created_at']
-    
+
     def __str__(self):
         return f"{self.get_rating_display()} by {self.user.email}"
-    
+
     @property
     def stars(self):
         return '★' * self.rating + '☆' * (5 - self.rating)

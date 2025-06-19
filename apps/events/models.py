@@ -14,12 +14,12 @@ class EventCategory(models.Model):
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     icon = models.CharField(max_length=50, blank=True)
-    
+
     class Meta:
         verbose_name = _('event category')
         verbose_name_plural = _('event categories')
         ordering = ['name']
-    
+
     def __str__(self):
         return self.name
 
@@ -30,14 +30,14 @@ class Event(models.Model):
         ('onsite', 'Onsite Event'),
         ('hybrid', 'Hybrid Event'),
     )
-    
+
     EVENT_STATUS = (
         ('draft', 'Draft'),
         ('published', 'Published'),
         ('cancelled', 'Cancelled'),
         ('completed', 'Completed'),
     )
-    
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organizer = models.ForeignKey(
         User,
@@ -56,12 +56,12 @@ class Event(models.Model):
         blank=True,
         related_name='events'
     )
-    
+
     # Event timing
     start_datetime = models.DateTimeField()
     end_datetime = models.DateTimeField()
     registration_deadline = models.DateTimeField(null=True, blank=True)
-    
+
     # Location details
     venue_name = models.CharField(max_length=200, blank=True)
     address = models.TextField(blank=True)
@@ -69,7 +69,7 @@ class Event(models.Model):
     state = models.CharField(max_length=100, blank=True)
     country = models.CharField(max_length=100, blank=True)
     online_link = models.URLField(blank=True, validators=[URLValidator()])
-    
+
     # Event logistics
     capacity = models.PositiveIntegerField(null=True, blank=True)
     is_free = models.BooleanField(default=True)
@@ -81,15 +81,15 @@ class Event(models.Model):
         validators=[MinValueValidator(0)]
     )
     status = models.CharField(max_length=10, choices=EVENT_STATUS, default='draft')
-    
+
     # Media
     featured_image = models.ImageField(upload_to='event_images/', blank=True, null=True)
-    
+
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     views = models.PositiveIntegerField(default=0)
-    
+
     class Meta:
         verbose_name = _('event')
         verbose_name_plural = _('events')
@@ -100,55 +100,68 @@ class Event(models.Model):
             models.Index(fields=['start_datetime']),
             models.Index(fields=['status']),
         ]
-    
+
     def __str__(self):
         return f"{self.title} ({self.get_event_type_display()})"
-    
+
     def save(self, *args, **kwargs):
         """Ensure price consistency and proper slug generation"""
         if self.is_free:
             self.price = None
-        
+
         # Generate slug only if it's empty
         if not self.slug:
             base_slug = slugify(self.title)
             if self.start_datetime:
                 date_str = self.start_datetime.strftime('%Y-%m-%d')
                 base_slug = f"{base_slug}-{date_str}"
-            
+
             self.slug = base_slug
             counter = 1
             while Event.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
                 self.slug = f"{base_slug}-{counter}"
                 counter += 1
-        
+
         super().save(*args, **kwargs)
     @property
     def is_upcoming(self):
         """Check if event is in the future"""
-        return self.start_datetime > datetime.now()
-    
+        now = timezone.now()
+        if timezone.is_naive(self.start_datetime):
+            # If start_datetime is naive, make it aware using the current timezone
+            start_datetime = timezone.make_aware(self.start_datetime, timezone.get_current_timezone())
+            return start_datetime > now
+        return self.start_datetime > now
+
     @property
     def is_past(self):
         """Check if event has already happened"""
-        return self.end_datetime < datetime.now()
-    
+        now = timezone.now()
+        if timezone.is_naive(self.end_datetime):
+            # If end_datetime is naive, make it aware using the current timezone
+            end_datetime = timezone.make_aware(self.end_datetime, timezone.get_current_timezone())
+            return end_datetime < now
+        return self.end_datetime < now
+
     @property
     def registration_open(self):
+        """Check if registration is still open"""
         now = timezone.now()
+        if not self.registration_deadline:
+            return False
+
         deadline = self.registration_deadline
-        # If deadline is naive, make it aware
-        if deadline is not None and timezone.is_naive(deadline):
+        if timezone.is_naive(deadline):
             deadline = timezone.make_aware(deadline, timezone.get_current_timezone())
-        return deadline is not None and now < deadline
-    
+        return now < deadline
+
     @property
     def available_seats(self):
         """Calculate available seats if capacity is set"""
         if self.capacity:
             return self.capacity - self.registrations.count()
         return None
-    
+
     @property
     def location_display(self):
         """Display location based on event type"""
@@ -168,12 +181,12 @@ class EventImage(models.Model):
     caption = models.CharField(max_length=100, blank=True)
     is_featured = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
-    
+
     class Meta:
         verbose_name = _('event image')
         verbose_name_plural = _('event images')
         ordering = ['order']
-    
+
     def __str__(self):
         return f"Image for {self.event.title}"
 
@@ -185,7 +198,7 @@ class EventRegistration(models.Model):
         ('cancelled', 'Cancelled'),
         ('waitlisted', 'Waitlisted'),
     )
-    
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     event = models.ForeignKey(
         Event,
@@ -205,7 +218,7 @@ class EventRegistration(models.Model):
     registration_date = models.DateTimeField(auto_now_add=True)
     attended = models.BooleanField(default=False)
     notes = models.TextField(blank=True)
-    
+
     # Payment fields (for paid events)
     payment_amount = models.DecimalField(
         max_digits=10,
@@ -215,16 +228,16 @@ class EventRegistration(models.Model):
     )
     payment_date = models.DateTimeField(null=True, blank=True)
     payment_method = models.CharField(max_length=50, blank=True)
-    
+
     class Meta:
         verbose_name = _('event registration')
         verbose_name_plural = _('event registrations')
         unique_together = ('event', 'user')
         ordering = ['-registration_date']
-    
+
     def __str__(self):
         return f"{self.user.email} registered for {self.event.title}"
-    
+
     def save(self, *args, **kwargs):
         """Set payment amount for paid events"""
         if self.event.price and not self.payment_amount:
@@ -246,12 +259,12 @@ class EventAgenda(models.Model):
     location = models.CharField(max_length=100, blank=True)
     is_break = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
-    
+
     class Meta:
         verbose_name = _('event agenda item')
         verbose_name_plural = _('event agenda items')
         ordering = ['order', 'start_time']
-    
+
     def __str__(self):
         return f"{self.title} at {self.event.title}"
 
@@ -264,7 +277,7 @@ class EventFeedback(models.Model):
         (4, '★★★★☆ - Very Good'),
         (5, '★★★★★ - Excellent'),
     ]
-    
+
     event = models.ForeignKey(
         Event,
         on_delete=models.CASCADE,
@@ -280,16 +293,16 @@ class EventFeedback(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     anonymous = models.BooleanField(default=False)
-    
+
     class Meta:
         verbose_name = _('event feedback')
         verbose_name_plural = _('event feedbacks')
         unique_together = ('event', 'user')
         ordering = ['-created_at']
-    
+
     def __str__(self):
         return f"Feedback for {self.event.title} by {self.user.email}"
-    
+
     @property
     def stars(self):
         return '★' * self.rating + '☆' * (5 - self.rating)

@@ -3,17 +3,27 @@
 {% block title %}Resources{% endblock %}
 {% block content %}
 <div class="container py-4">
+     {% if user.is_authenticated %}
+    <div class="d-flex justify-content-end mb-4">
+        <a href="{% url 'resources:resource_upload' %}" class="btn btn-primary">
+            <i class="bi bi-upload me-2"></i>Upload Resource
+        </a>
+    </div>
+    {% endif %}
     <div class="row g-4">
         {% for resource in resources %}
         <div class="col-12 col-sm-6 col-lg-4">
             <div class="card h-100 shadow-sm">
-                {% if resource.thumbnail %}
-                    <img src="{{ resource.thumbnail.url }}" class="card-img-top" style="height:180px;object-fit:cover;">
-                {% else %}
-                    <div class="bg-light d-flex align-items-center justify-content-center" style="height:180px;">
-                        <span class="text-muted">No Image</span>
-                    </div>
-                {% endif %}
+               {% if resource.thumbnail %}
+    <img src="{{ resource.thumbnail.url }}" class="card-img-top" style="height:180px;object-fit:cover;">
+{% else %}
+    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:180px;">
+        <div class="text-center">
+            <i class="bi bi-file-earmark-pdf fs-1 text-muted"></i>
+            <p class="small mt-2">{{ resource.get_file_extension|upper }}</p>
+        </div>
+    </div>
+{% endif %}
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ resource.title }}</h5>
                     <p class="card-text text-truncate">{{ resource.description|truncatechars:80 }}</p>

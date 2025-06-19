@@ -1,31 +1,84 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
-{% block title %}{% if form.instance.pk %}Edit Event{% else %}Create Event{% endif %}{% endblock %}{% block content %}
+
+{% block title %}
+    {% if object %}Edit {{ object.title }}{% else %}Create Event{% endif %}
+{% endblock %}
+
+{% block content %}
 <div class="container py-4">
-    <h2 class="mb-4 text-center">{% if form.instance.pk %}Edit Event{% else %}Create Event{% endif %}</h2>
+    {% if messages %}
+    <div class="row">
+        <div class="col-12">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <h2 class="mb-4 text-center">
+        {% if object %}Edit Event{% else %}Create Event{% endif %}
+    </h2>
+    
     <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
             <div class="card shadow-sm">
-                <div class="card-body" style="max-height: 75vh; overflow-y: auto;">
+                <div class="card-body">
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        {{ form.non_field_errors }}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
                         {% for field in form %}
                             <div class="mb-3">
-                                {{ field.label_tag }}
-                                {% if field.errors %}
-                                    {{ field|add_class:"form-control is-invalid" }}
+                                <label for="{{ field.id_for_label }}" class="form-label">
+                                    {{ field.label }}
+                                    {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                </label>
+                                
+                                {% if field.field.widget.input_type == 'checkbox' %}
+                                    <div class="form-check">
+                                        {{ field|add_class:"form-check-input" }}
+                                        <label class="form-check-label" for="{{ field.id_for_label }}">
+                                            {{ field.label }}
+                                        </label>
+                                    </div>
                                 {% else %}
-                                    {{ field|add_class:"form-control" }}
+                                    {% if field.errors %}
+                                        {{ field|add_class:"form-control is-invalid" }}
+                                    {% else %}
+                                        {{ field|add_class:"form-control" }}
+                                    {% endif %}
                                 {% endif %}
+                                
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
+                                
                                 {% for error in field.errors %}
-                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                    <div class="invalid-feedback">{{ error }}</div>
                                 {% endfor %}
                             </div>
                         {% endfor %}
-                        <div class="d-flex justify-content-between">
-                            <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Save Changes{% else %}Create Event{% endif %}</button>
-                            <a href="{% url 'events:event_list' %}" class="btn btn-secondary ms-2">Cancel</a>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                {% if object %}Save Changes{% else %}Create Event{% endif %}
+                            </button>
+                            <a href="{% if object %}{% url 'events:event_detail' object.slug %}{% else %}{% url 'events:event_list' %}{% endif %}" 
+                               class="btn btn-secondary">
+                                Cancel
+                            </a>
                         </div>
                     </form>
                 </div>

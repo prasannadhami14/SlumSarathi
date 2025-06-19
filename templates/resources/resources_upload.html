@@ -1,83 +1,81 @@
-<!-- filepath: c:\dev\django_project\slumSarathi\templates\resources\upload.html -->
 {% extends "base.html" %}
 {% load widget_tweaks %}
+
 {% block title %}Upload Resource{% endblock %}
+
 {% block content %}
 <div class="container py-4">
+    <!-- Messages Section -->
+    {% if messages %}
+    <div class="row">
+        <div class="col-12">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6">
-            <div class="card shadow-sm p-4">
-                <h2 class="mb-4 text-center">Upload New Resource</h2>
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {% if form.non_field_errors %}
-                        <div class="alert alert-danger">
-                            {{ form.non_field_errors }}
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="mb-4 text-center">Upload New Resource</h2>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">
+                                    {{ field.label }}
+                                    {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                </label>
+                                
+                                {% if field.field.widget.input_type == 'select' %}
+                                    {{ field|add_class:"form-select" }}
+                                {% elif field.field.widget.input_type == 'file' %}
+                                    {{ field|add_class:"form-control" }}
+                                {% else %}
+                                    {{ field|add_class:"form-control" }}
+                                {% endif %}
+                                
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
+                                
+                                {% for error in field.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-upload me-2"></i>Upload Resource
+                            </button>
+                            <a href="{% url 'resources:resource_list' %}" class="btn btn-secondary">
+                                Cancel
+                            </a>
                         </div>
-                    {% endif %}
-                    <div class="mb-3">
-                        {{ form.title.label_tag }} 
-                        {{ form.title|add_class:"form-control" }}
-                        {% for error in form.title.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.description.label_tag }} 
-                        {{ form.description|add_class:"form-control" }}
-                        {% for error in form.description.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.file.label_tag }}
-                        {{ form.file|add_class:"form-control" }}
-                        {% for error in form.file.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.resource_type.label_tag }} 
-                        {{ form.resource_type|add_class:"form-select" }}
-                        {% for error in form.resource_type.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.course_name.label_tag }}
-                        {{ form.course_name|add_class:"form-control" }}
-                        {% for error in form.course_name.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.institution.label_tag }}
-                        {{ form.institution|add_class:"form-control" }}
-                        {% for error in form.institution.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.year.label_tag }}
-                        {{ form.year|add_class:"form-control" }}
-                        {% for error in form.year.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="mb-3">
-                        {{ form.license_type.label_tag }}
-                        {{ form.license_type|add_class:"form-select" }}
-                        {% for error in form.license_type.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <!-- Add other fields as needed, using form-control or form-select as appropriate -->
-                    <button class="btn btn-success w-100" type="submit">Upload</button>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 <script>
     // Add accept attribute for PDF files only
     document.addEventListener('DOMContentLoaded', function() {

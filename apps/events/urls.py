@@ -17,6 +17,6 @@ urlpatterns = [
     path('<slug:slug>/register/', register_for_event, name='event_register'),
     path('403/', permission_denied, {'exception': Exception("Permission Denied")}),
     path('<slug:slug>/registrations/', EventRegistrationsView.as_view(), name='event_registrations'),
-    path('registrations/<int:pk>/promote/', promote_attendee, name='promote_attendee'),
-    path('registrations/<int:pk>/remove/', remove_registration, name='remove_registration')
+    path('registrations/<uuid:pk>/promote/', promote_attendee, name='promote_attendee'),
+    path('registrations/<uuid:pk>/remove/', remove_registration, name='remove_registration')
 ]
