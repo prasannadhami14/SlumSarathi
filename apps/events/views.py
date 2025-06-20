@@ -5,8 +5,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Event, EventRegistration
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
-from django.http import HttpResponseForbidden,Http404
-from . import models
+from django.http import Http404
+from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from .forms import EventForm
@@ -96,6 +96,23 @@ class EventUpdateView(LoginRequiredMixin, OrganizerRequiredMixin, UpdateView):
     form_class = EventForm
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
+    model = Event
+    template_name = 'events/event_form.html'
+    form_class = EventForm
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+
+    def form_valid(self, form):
+        original_event = self.get_object()
+        original_status = original_event.status
+        # If the status has changed, save with update_fields
+        if form.instance.status != original_status:
+            # Save only the status field
+            form.instance.save(update_fields=['status'])
+            return redirect(self.get_success_url())
+        else:
+            # Save normally for other changes
+            return super().form_valid(form)
 
     def get_success_url(self):
         return reverse('events:event_detail', kwargs={'slug': self.object.slug})
