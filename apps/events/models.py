@@ -123,6 +123,8 @@ class Event(models.Model):
                 counter += 1
 
         super().save(*args, **kwargs)
+    def get_absolute_url(self):
+        return reverse('events:event_detail', kwargs={'slug': self.slug})
     @property
     def is_upcoming(self):
         """Check if event is in the future"""

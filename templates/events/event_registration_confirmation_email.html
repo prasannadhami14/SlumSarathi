@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Confirmation</title>
+</head>
+<body>
+    <p>Dear {{ user.get_full_name|default:user.username }},</p>
+    <p>
+        You have <strong>successfully registered</strong> for the event: <strong>{{ event.title }}</strong>!
+    </p>
+    <p>
+        <strong>Event Details:</strong><br>
+        Date & Time: {{ event.start_datetime|date:"F d, Y, h:i A" }}<br>
+        Location: {{ event.location_display }}<br>
+        Status: {{ event.get_status_display }}
+    </p>
+    <p>
+        You can view the event details <a href="{{ domain }}{{ event.get_absolute_url }}">here</a>.
+    </p>
+    <p>
+        If you have any questions, please contact the organizer at {{ event.organizer.email }}.
+    </p>
+    <p>
+        Thank you for registering!<br>
+        The Events Team
+    </p>
+</body>
+</html>

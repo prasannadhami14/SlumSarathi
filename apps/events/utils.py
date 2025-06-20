@@ -78,3 +78,33 @@ def send_event_published_email(event, users, request):
             logger.error(f"Failed to send email to {user.email}: {str(e)}")
 
     return sent_count, invalid_emails
+
+# send registration confirmation email
+def send_registration_confirmation_email(event, user, request):
+    subject = f"Registration Confirmation: {event.title}"
+    domain = get_current_site(request).domain
+    context = {
+        'user': user,
+        'event': event,
+        'domain': f"http://{domain}" if not request.is_secure() else f"https://{domain}",
+    }
+    html_content = render_to_string('events/event_registration_confirmation_email.html', context)
+    text_content = (
+        f"Dear {user.get_full_name() or user.username},\n\n"
+        f"You have successfully registered for the event: {event.title}!\n\n"
+        f"Event Details:\n"
+        f"- Date & Time: {event.start_datetime.strftime('%B %d, %Y, %I:%M %p')}\n"
+        f"- Location: {event.location_display}\n"
+        f"- Status: {event.get_status_display()}\n\n"
+        f"View event details: {context['domain']}{event.get_absolute_url()}\n\n"
+        f"If you have questions, contact the organizer at {event.organizer.email}.\n\n"
+        "Thank you for registering!\nThe Events Team"
+    )
+    email = EmailMultiAlternatives(
+        subject=subject,
+        body=text_content,
+        from_email=None,  # Uses DEFAULT_FROM_EMAIL
+        to=[user.email],
+    )
+    email.attach_alternative(html_content, "text/html")
+    email.send(fail_silently=False)

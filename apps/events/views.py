@@ -2,17 +2,18 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy,reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+from apps.events.utils import send_registration_confirmation_email
 from .models import Event, EventRegistration
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, HttpRequest
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from .forms import EventForm
 from django.core.exceptions import PermissionDenied
-
-
+from django.contrib.sites.shortcuts import get_current_site
 class EventListView(ListView):
     model = Event
     template_name = 'events/event_list.html'
@@ -159,8 +160,11 @@ def register_for_event(request, slug):
         status='waitlisted' if event.capacity and
               event.available_seats <= 0 else 'registered'
     )
-
-    messages.success(request, "Successfully registered for the event")
+    request_for_email = HttpRequest()
+    request_for_email.META['HTTP_HOST'] = get_current_site(request).domain
+    request_for_email.META['SERVER_PROTOCOL'] = 'http'
+    send_registration_confirmation_email(event, request.user, request_for_email)
+    messages.success(request, "Successfully registered for the event check your email for confirmation.")
     return redirect('events:event_detail', slug=slug)
 class EventRegistrationsView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'events/event_registrations.html'

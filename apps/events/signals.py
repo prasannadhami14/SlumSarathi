@@ -1,33 +1,44 @@
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from .models import Event, EventRegistration
-from .tasks import send_event_published_email_task  # Import the task
+from .models import Event
+from .utils import send_event_published_email  # Import the utility function
+from django.http import HttpRequest
+from accounts.models import User  # Import your custom User model
+from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 
 @receiver(pre_save, sender=Event)
 def cache_old_status(sender, instance, **kwargs):
     if instance.pk:
-        old_instance = Event.objects.get(pk=instance.pk)
-        instance._old_status = old_instance.status
+        try:
+            old_instance = Event.objects.get(pk=instance.pk)
+            instance._old_status = old_instance.status
+        except Event.DoesNotExist:
+            instance._old_status = None
     else:
         instance._old_status = None
+def notify_all_users_event_published(event):
+    print("Notifying all users about published event!")
+    users = User.objects.filter(is_active=True).exclude(email='').distinct()
+    users = [user for user in users if user.email]  # Extra check for valid emails
+    if users:
+        request = HttpRequest()
+        request.META['HTTP_HOST'] = get_current_site(request).domain  # Or your domain
+        request.META['SERVER_PROTOCOL'] = 'https'
+        send_event_published_email(event, users, request)
+
 @receiver(post_save, sender=Event)
 def send_published_event_notification(sender, instance, created, update_fields=None, **kwargs):
     try:
         print("Signal fired for event:", instance.id)
-        if not created and update_fields and 'status' in update_fields:
-            print("Status in update_fields, current status:", instance.status)
-            print("Old status (from pre_save):", getattr(instance, '_old_status', None))
+        # If event is newly created and status is published, send emails
+        if created and instance.status == 'published':
+                notify_all_users_event_published(instance)
+        # If event is updated and status changed to published, send emails
+        elif not created and update_fields and 'status' in update_fields:
             if hasattr(instance, '_old_status') and instance._old_status != 'published' and instance.status == 'published':
-                print("Status changed to published, calling Celery task!")
-                registrations = EventRegistration.objects.filter(event=instance)
-                user_ids = [str(reg.user.id) for reg in registrations if reg.user.email]
-                print("User IDs to notify:", user_ids)
-                if user_ids:
-                    print("Calling Celery task!")
-                    send_event_published_email_task.delay(
-                        str(instance.id),
-                        user_ids,
-                        'localhost:8000'
-                    )
+                notify_all_users_event_published(instance)
     except Event.DoesNotExist:
         print("Old instance does not exist")
+
+                

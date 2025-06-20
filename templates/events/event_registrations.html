@@ -55,23 +55,23 @@
                             </td>
                             <td>{{ registration.registration_date|date:"M d, Y H:i" }}</td>
                             <td>
-                                <div class="btn-group btn-group-sm">
+                                <div class="btn-group btn-group-sm gap-2">
                                     <a href="mailto:{{ registration.user.email }}" 
-                                       class="btn btn-outline-primary" title="Email">
-                                        <i class="bi bi-envelope"></i>
+                                       class="btn btn-outline-primary rounded" title="Email">
+                                        <i class="bi bi-envelope me-2">Email</i>
                                     </a>
                                     {% if registration.status == 'waitlisted' and event.available_seats > 0 %}
                                         <form method="post" action="{% url 'events:promote_attendee' registration.id %}" class="d-inline">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-outline-success" title="Promote to registered">
-                                                <i class="bi bi-arrow-up"></i>
+                                                <i class="bi bi-arrow-up">Promote</i>
                                             </button>
                                         </form>
                                     {% endif %}
                                     <form method="post" action="{% url 'events:remove_registration' registration.id %}" class="d-inline">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-outline-danger" title="Remove">
-                                            <i class="bi bi-trash"></i>
+                                            <i class="bi bi-trash">Remove</i>
                                         </button>
                                     </form>
                                 </div>
