@@ -1,6 +1,6 @@
 # SlumSarathi
 
-**SlumSarathi** is a comprehensive web platform built with Django, designed to empower and connect communities by providing easy access to essential services, educational resources, and local events.
+**SlumSarathi** is a comprehensive web platform built with Django, designed to empower and connect Students by providing easy access to essential services, educational resources, and events.
 
 ## ✨ Key Features
 
@@ -60,7 +60,7 @@ Follow these steps to get the project running locally.
 ### 2. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/slumSarathi.git
+git clone https://github.com/prasannadhami14/slumSarathi.git
 cd slumSarathi
 ```
 
