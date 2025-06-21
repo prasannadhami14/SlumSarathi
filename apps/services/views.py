@@ -20,17 +20,18 @@ def service_list(request):
         'services': services,
         'categories': categories,
         'query': query,
+        'search_scope': 'services',
     })
 
-def service_list_by_category(request, slug):
-    category = get_object_or_404(ServiceCategory, slug=slug)
-    services = Service.objects.filter(category=category, is_available=True)
-    categories = ServiceCategory.objects.all()
-    return render(request, 'services/service_list.html', {
-        'services': services,
-        'category': category,
-        'categories': categories
-    })
+# def service_list_by_category(request, slug):
+#     category = get_object_or_404(ServiceCategory, slug=slug)
+#     services = Service.objects.filter(category=category, is_available=True)
+#     categories = ServiceCategory.objects.all()
+#     return render(request, 'services/service_list.html', {
+#         'services': services,
+#         'category': category,
+#         'categories': categories
+#     })
 
 def service_detail(request, pk):
     service = get_object_or_404(Service, pk=pk)

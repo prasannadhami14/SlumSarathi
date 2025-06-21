@@ -1,59 +1,96 @@
 {% load static %}
 <header class="mb-4">
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm border-bottom border-2 fixed-top" style="border-color: #0d6efd !important;">
-        <div class="container-fluid ">
+        <div class="container-fluid">
+            <!-- Logo -->
             <a href="{% url 'homepage' %}" class="navbar-brand d-flex align-items-center">
                 <img src="{% static 'img/logo.jpg' %}" alt="SlumSarathi Logo" height="80" width="80" style="object-fit:contain;border-radius: 50%;">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="mainNavbar">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-2 me-3">
-                    <li class="nav-item">
-                        <a href="{% url 'services:service_list' %}" class="nav-link fw-semibold">Services</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'resources:resource_list' %}" class="nav-link fw-semibold">Resources</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'events:event_list' %}" class="nav-link fw-semibold">Events</a>
-                    </li>
-                </ul>
-                <form class="d-flex mb-2 mb-lg-0 me-lg-3" method="get" action="{% url 'services:service_list' %}">
-                    <input class="form-control form-control-md me-2" type="search" name="q" placeholder="Search services..." aria-label="Search" value="{{ query|default:'' }}">
-                </form>
-                {% if user.is_authenticated %}
-                <div class="dropdown ms-lg-2">
-                    <a class="nav-link dropdown-toggle p-0 d-flex align-items-center"
-                       href="#" id="profileDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false" style="border: none; background: none;">
-                        <img src="{% static 'img/profile.jpeg' %}" alt="Profile" width="40" height="40"
-                             class="rounded-circle border" style="object-fit:cover;">
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                        <li>
-                            <a class="dropdown-item" href="{% url 'profile' user.id %}">My Profile</a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'services:incoming_service_requests' %}">Incoming Requests</a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-                        </li>
-                    </ul>
+
+            <!-- This div contains items that are on the right on desktop, but rearranged on mobile -->
+            <div class="d-flex align-items-center">
+                <!-- Hamburger button (visible on mobile) -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <!-- Profile Icon (visible on mobile if logged in) -->
+                <div class="d-lg-none ms-2">
+                    {% if user.is_authenticated %}
+                        <div class="dropdown">
+                             <a class="nav-link dropdown-toggle p-0 d-flex align-items-center"
+                                href="#" id="profileDropdownMobile" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false" style="border: none; background: none;">
+                                <img src="{% static 'img/profile.jpeg' %}" alt="Profile" width="40" height="40"
+                                     class="rounded-circle border" style="object-fit:cover;">
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdownMobile">
+                                <li><a class="dropdown-item" href="{% url 'profile' user.id %}">My Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'services:my_service_requests' %}">My Service Requests</a></li>
+                                <li><a class="dropdown-item" href="{% url 'services:incoming_service_requests' %}">Incoming Requests</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
-                {% else %}
-                <ul class="navbar-nav mb-2 mb-lg-0 ms-lg-2">
-                    <li class="nav-item">
-                        <a href="{% url 'login' %}" class="nav-link">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'register' %}" class="nav-link">Register</a>
-                    </li>
+            </div>
+            
+            <!-- Collapsible content -->
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <!-- Nav Links -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-lg-2">
+                    <li class="nav-item"><a href="{% url 'homepage' %}" class="nav-link fw-semibold">Home</a></li>
+                    <li class="nav-item"><a href="{% url 'services:service_list' %}" class="nav-link fw-semibold">Services</a></li>
+                    <li class="nav-item"><a href="{% url 'resources:resource_list' %}" class="nav-link fw-semibold">Resources</a></li>
+                    <li class="nav-item"><a href="{% url 'events:event_list' %}" class="nav-link fw-semibold">Events</a></li>
+                     <!-- Login/Register for Mobile -->
+                    {% if not user.is_authenticated %}
+                    <li class="nav-item d-lg-none"><a href="{% url 'login' %}" class="nav-link">Login</a></li>
+                    <li class="nav-item d-lg-none text-center"><a href="{% url 'register' %}" class="nav-link">Register</a></li>
+                    {% endif %}
                 </ul>
-                {% endif %}
+
+                <!-- Search Form for Mobile -->
+                <form class="d-flex d-lg-none p-3" method="get"
+                      action="{% if search_scope == 'resources' %}{% url 'resources:resource_list' %}{% elif search_scope == 'events' %}{% url 'events:event_list' %}{% else %}{% url 'services:service_list' %}{% endif %}">
+                    <input class="form-control" type="search" name="q" placeholder="Search..."
+                           data-search-endpoint="{% if search_scope == 'resources' %}{% url 'resources:ajax_resource_search' %}{% elif search_scope == 'events' %}{% url 'events:ajax_event_search' %}{% else %}{% url 'services:ajax_service_search' %}{% endif %}"
+                           data-list-container="{% if search_scope == 'resources' %}resource-list{% elif search_scope == 'events' %}event-list{% else %}service-list{% endif %}">
+                </form>
+
+                <!-- Right-aligned items for desktop -->
+                <div class="d-none d-lg-flex align-items-center ms-auto">
+                    <form class="d-flex me-2" method="get"
+                          action="{% if search_scope == 'resources' %}{% url 'resources:resource_list' %}{% elif search_scope == 'events' %}{% url 'events:event_list' %}{% else %}{% url 'services:service_list' %}{% endif %}">
+                        <input class="form-control" type="search" name="q" placeholder="Search..."
+                               data-search-endpoint="{% if search_scope == 'resources' %}{% url 'resources:ajax_resource_search' %}{% elif search_scope == 'events' %}{% url 'events:ajax_event_search' %}{% else %}{% url 'services:ajax_service_search' %}{% endif %}"
+                               data-list-container="{% if search_scope == 'resources' %}resource-list{% elif search_scope == 'events' %}event-list{% else %}service-list{% endif %}">
+                    </form>
+
+                    {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle p-0 d-flex align-items-center"
+                               href="#" id="profileDropdownDesktop" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false" style="border: none; background: none;">
+                                <img src="{% static 'img/profile.jpeg' %}" alt="Profile" width="40" height="40"
+                                     class="rounded-circle border" style="object-fit:cover;">
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdownDesktop">
+                               <li><a class="dropdown-item" href="{% url 'profile' user.id %}">My Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'services:my_service_requests' %}">My Service Requests</a></li>
+                                <li><a class="dropdown-item" href="{% url 'services:incoming_service_requests' %}">Incoming Requests</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <ul class="navbar-nav flex-row">
+                            <li class="nav-item"><a href="{% url 'login' %}" class="nav-link">Login</a></li>
+                            <li class="nav-item ms-2"><a href="{% url 'register' %}" class="nav-link">Register</a></li>
+                        </ul>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>

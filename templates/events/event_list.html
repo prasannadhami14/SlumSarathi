@@ -15,59 +15,21 @@
             <a class="nav-link {% if not request.GET.status %}active{% endif %}" 
                href="{% url 'events:event_list' %}">All Events</a>
         </li>
+        {% if event.status == 'draft' and not user.is_authenticated or event.status == 'draft' and user != event.organizer and not user.is_staff %}
+
         <li class="nav-item">
-            <a class="nav-link {% if request.GET.status == 'published' %}active{% endif %}" 
+            <a class="nav-link {% if request.GET.status == 'published' %}active{% endif %}"
                href="{% url 'events:event_list' %}?status=published">Published</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if request.GET.status == 'draft' %}active{% endif %}" 
+            <a class="nav-link {% if request.GET.status == 'draft' %}active{% endif %}"
                href="{% url 'events:event_list' %}?status=draft">Drafts</a>
         </li>
+        {% endif %}
     </ul>
     
-    <div class="row g-4">
-        {% for event in events %}
-        {# Show draft events only to organizers or staff #}
-        {% if event.status == 'draft' and not user.is_authenticated or event.status == 'draft' and user != event.organizer and not user.is_staff %}
-            {# Hide from unauthorized users #}
-        {% else %}
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                {% if event.featured_image %}
-                    <img src="{{ event.featured_image.url }}" class="card-img-top" style="height:180px;object-fit:cover;">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">
-                        {{ event.title }}
-                        {% if event.status == 'draft' %}
-                            <span class="badge bg-warning text-dark">Draft</span>
-                        {% elif event.status == 'cancelled' %}
-                            <span class="badge bg-danger">Cancelled</span>
-                        {% endif %}
-                    </h5>
-                    <p class="card-text">{{ event.description|truncatechars:80 }}</p>
-                    <div class="mb-2">
-                        <span class="badge bg-secondary">{{ event.get_event_type_display }}</span>
-                        {% if event.category %}
-                            <span class="badge bg-info">{{ event.category }}</span>
-                        {% endif %}
-                    </div>
-                    <div class="mt-2">
-                        <a href="{% url 'events:event_detail' event.slug %}" class="btn btn-outline-primary btn-sm">View Details</a>
-                        {% if user.is_authenticated and user == event.organizer or user.is_staff %}
-                            <a href="{% url 'events:event_edit' event.slug %}" class="btn btn-warning btn-sm ms-2">Edit</a>
-                            <a href="{% url 'events:event_delete' event.slug %}" class="btn btn-danger btn-sm ms-2">Delete</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info text-center">No events found.</div>
-        </div>
-        {% endfor %}
+    <div class="row g-4" id="event-list">
+        {% include "events/_event_list_items.html" %}
     </div>
 </div>
 {% endblock %}

@@ -6,7 +6,7 @@ app_name = "services"
 urlpatterns = [
     # Service listing and detail
     path('', views.service_list, name='service_list'),
-    path('category/<slug:slug>/', views.service_list_by_category, name='service_list_by_category'),
+    # path('category/<slug:slug>/', views.service_list_by_category, name='service_list_by_category'),
     path('service/<uuid:pk>/', views.service_detail, name='service_detail'),
 
     # Service CRUD

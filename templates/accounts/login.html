@@ -6,14 +6,6 @@
   <div class="w-100" style="max-width: 420px;">
     <div class="card shadow-sm p-4">
       <h2 class="mb-4 text-center">Login</h2>
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
       <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         <div class="mb-3">

@@ -3,7 +3,8 @@
 from django.urls import path
 from .views import (
     EventListView, EventDetailView, EventCreateView,
-    EventUpdateView, EventDeleteView, register_for_event,EventRegistrationsView,promote_attendee,remove_registration
+    EventUpdateView, EventDeleteView, register_for_event,EventRegistrationsView,promote_attendee,remove_registration,
+    ajax_event_search
 )
 from django.views.defaults import permission_denied
 
@@ -19,5 +20,8 @@ urlpatterns = [
     path('403/', permission_denied, {'exception': Exception("Permission Denied")}),
     path('<slug:slug>/registrations/', EventRegistrationsView.as_view(), name='event_registrations'),
     path('registrations/<uuid:pk>/promote/', promote_attendee, name='promote_attendee'),
-    path('registrations/<uuid:pk>/remove/', remove_registration, name='remove_registration')
+    path('registrations/<uuid:pk>/remove/', remove_registration, name='remove_registration'),
+    
+    # AJAX URLs
+    path('ajax/search/', ajax_event_search, name='ajax_event_search'),
 ]

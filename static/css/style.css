@@ -39,8 +39,21 @@ ul>li>a:hover {
   letter-spacing: 0.1em;
 }
 
+.navbar-logo {
+    height: 80px;
+    width: 80px;
+    object-fit: contain;
+    border-radius: 50%;
+    transition: all 0.3s ease-in-out;
+}
+
 /* Make headings and text larger on small screens */
-@media (max-width: 576px) {
+@media (max-width: 768px) {
+    .navbar-logo {
+        height: 60px;
+        width: 60px;
+    }
+
     h1, .display-4 {
         font-size: 2rem !important;
     }
@@ -53,10 +66,6 @@ ul>li>a:hover {
     }
     .card-title {
         font-size: 1.2rem !important;
-    }
-    .navbar-brand img {
-        max-width: 110px !important;
-        height: 32px !important;
     }
     .container, .container-fluid {
         padding-left: 10px !important;

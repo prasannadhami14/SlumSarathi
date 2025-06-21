@@ -4,7 +4,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
 import logging
-
+from django.conf import settings
 # Set up logging
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ def send_event_published_email(event, users, request):
         email = EmailMultiAlternatives(
             subject=subject,
             body=text_content,
-            from_email=None,  # Uses DEFAULT_FROM_EMAIL from settings
+            from_email=settings.DEFAULT_FROM_EMAIL,  # Uses DEFAULT_FROM_EMAIL from settings
             to=[user.email],
         )
         email.attach_alternative(html_content, "text/html")
@@ -103,7 +103,7 @@ def send_registration_confirmation_email(event, user, request):
     email = EmailMultiAlternatives(
         subject=subject,
         body=text_content,
-        from_email=None,  # Uses DEFAULT_FROM_EMAIL
+        from_email=settings.DEFAULT_FROM_EMAIL,  # Uses DEFAULT_FROM_EMAIL
         to=[user.email],
     )
     email.attach_alternative(html_content, "text/html")

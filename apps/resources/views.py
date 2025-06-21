@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.urls import reverse
 from django.contrib import messages
+from django.template.loader import render_to_string
 from .models import Resource, ResourceComment, ResourceRating, ResourceCategory, ResourceDownload
 from .forms import ResourceUploadForm  # You need to create this form
 from django.utils.text import slugify
@@ -40,6 +41,7 @@ class ResourceListView(View):
         return render(request, 'resources/resources_list.html', {
             'resources': resources,
             'categories': categories,
+            'search_scope': 'resources',
         })
 
 class ResourceDetailView(View):
@@ -146,3 +148,16 @@ class ResourceDeleteView(View):
         resource.delete()
         messages.success(request, "Resource deleted successfully!")
         return redirect('resources:resource_list')
+
+def ajax_resource_search(request):
+    query = request.GET.get('q', '')
+    resources = Resource.objects.filter(is_approved=True)
+    if query:
+        resources = resources.filter(title__icontains=query)
+    
+    # Render the resources list items as HTML
+    html = render_to_string('resources/_resource_list_items.html', {
+        'resources': resources,
+    }, request=request)
+    
+    return JsonResponse({'html': html})

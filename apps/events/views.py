@@ -2,10 +2,10 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy,reverse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 from apps.events.utils import send_registration_confirmation_email
 from .models import Event, EventRegistration
-from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
 from django.http import Http404, HttpRequest
 from django.db.models import Q
@@ -44,6 +44,11 @@ class EventListView(ListView):
 
         # Order by start datetime (newest first)
         return queryset.order_by('-start_datetime')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_scope'] = 'events'
+        return context
 
 class EventDetailView(DetailView):
     model = Event
@@ -208,3 +213,18 @@ def remove_registration(request, pk):
     messages.success(request, f"Registration for {user_name} removed successfully")
 
     return redirect('events:event_registrations', slug=registration.event.slug)
+
+def ajax_event_search(request):
+    query = request.GET.get('q', '')
+    events = Event.objects.all()
+    
+    # Filter by query if provided
+    if query:
+        events = events.filter(title__icontains=query)
+    
+    # Render the events list items as HTML
+    html = render_to_string('events/_event_list_items.html', {
+        'events': events,
+    }, request=request)
+    
+    return JsonResponse({'html': html})

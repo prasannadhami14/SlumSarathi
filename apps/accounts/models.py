@@ -56,7 +56,7 @@ class User(AbstractUser):
     
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, default=1)
     is_verified = models.BooleanField(default=False)
-    verification_uuid = models.UUIDField(default=uuid.uuid4, editable=False)
+    verification_uuid = models.UUIDField(default=uuid.uuid4, editable=True)
     
     objects = CustomUserManager()
 

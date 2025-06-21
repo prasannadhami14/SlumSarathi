@@ -11,22 +11,4 @@
 <div class="row g-4 justify-content-center" id="service-list">
     {% include "services/_service_list_items.html" %}
 </div>
-<script>
-const searchInput = document.querySelector('input[name="q"]');
-const serviceList = document.getElementById('service-list');
-let timeout = null;
-
-if (searchInput) {
-    searchInput.addEventListener('input', function() {
-        clearTimeout(timeout);
-        timeout = setTimeout(function() {
-            fetch(`/services/ajax/search/?q=${encodeURIComponent(searchInput.value)}`)
-                .then(response => response.json())
-                .then(data => {
-                    serviceList.innerHTML = data.html;
-                });
-        }, 300); // debounce for 300ms
-    });
-}
-</script>
 {% endblock %}
