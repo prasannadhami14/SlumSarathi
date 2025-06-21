@@ -1,37 +1,74 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Published Notification</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>New Event Published!</title>
     <style>
-        /* Minimal inline CSS for email client compatibility */
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        .container { max-width: 600px; }
-        .card { background-color: #ffffff; }
-        a.btn { text-decoration: none; }
+        /* Basic responsive styling */
+        @media screen and (max-width: 600px) {
+            .content {
+                width: 100% !important;
+                display: block !important;
+                padding: 10px !important;
+            }
+            .main-title {
+                font-size: 20px !important;
+            }
+        }
     </style>
 </head>
-<body>
-    <div class="container py-4">
-        <div class="card shadow-sm p-4">
-            <h2 class="text-center mb-4">Event Published: {{ event.title }}</h2>
-            <p>Dear {{ user.get_full_name|default:user.username }},</p>
-            <p>We’re excited to inform you that the event <strong>{{ event.title }}</strong> has been published and is now open for participation!</p>
-            <p><strong>Event Details:</strong></p>
-            <ul class="list-unstyled">
-                <li><strong>Date & Time:</strong> {{ event.start_datetime|date:"F d, Y, g:i A" }}</li>
-                <li><strong>Location:</strong> {{ event.city }}, {{ event.country }} ({{ event.event_type|title }})</li>
-                <li><strong>Status:</strong> {{ event.get_status_display }} <span class="text-danger">*</span></li>
-            </ul>
-            <p class="text-center">
-                <a href="{{ domain }}{% url 'events:event_detail' slug=event.slug %}" class="btn btn-primary">View Event Details</a>
-            </p>
-            <p>If you have any questions, please contact the organizer at {{ event.organizer.email }}.</p>
-            <p class="text-muted text-center">This is an automated email. Please do not reply directly to this message.</p>
-        </div>
-    </div>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tr>
+            <td>
+                <table align="center" border="0" cellpadding="0" cellspacing="0" class="content" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td align="center" style="background-color: #ffc107; padding: 30px; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                            <h1 class="main-title" style="color: #ffffff; margin: 0; font-size: 24px;">A New Event is Here!</h1>
+                        </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <p style="color: #333333; font-size: 16px; line-height: 1.6;">
+                                Hi {{ user.get_full_name|default:user.username }},
+                            </p>
+                            <p style="color: #333333; font-size: 16px; line-height: 1.6;">
+                                We're excited to announce a new event has been published: <strong>{{ event.title }}</strong>!
+                            </p>
+                            <div style="background-color: #f9f9f9; padding: 20px; border-radius: 5px; margin-top: 20px; margin-bottom: 20px;">
+                                <h3 style="color: #333333; margin-top: 0; font-size: 18px;">Event Details</h3>
+                                <p style="color: #555555; font-size: 15px; margin: 5px 0;">
+                                    <strong>Date & Time:</strong> {{ event.start_datetime|date:"F d, Y, h:i A" }}
+                                </p>
+                                <p style="color: #555555; font-size: 15px; margin: 5px 0;">
+                                    <strong>Location:</strong> {{ event.location_display }}
+                                </p>
+                            </div>
+                            <!-- Button -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding: 10px 0;">
+                                        <a href="{{ domain }}{% url 'events:event_detail' slug=event.slug %}" target="_blank" style="background-color: #0d6efd; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">View Event & Register</a>
+                                    </td>
+                                </tr>
+                            </table>
+                             <p style="color: #333333; font-size: 16px; line-height: 1.6;">
+                                If you have any questions, please contact the organizer at <a href="mailto:{{ event.organizer.email }}" style="color: #0d6efd;">{{ event.organizer.email }}</a>.
+                            </p>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 20px; text-align: center; color: #888888; font-size: 12px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+                            <p style="margin: 0;">This is an automated notification.</p>
+                            <p style="margin: 5px 0 0 0;">The SlumSarathi Team</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
