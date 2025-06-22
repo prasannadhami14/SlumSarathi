@@ -30,9 +30,15 @@ def register_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         user_type = request.POST.get('user_type', 1)
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return render(request, 'accounts/register.html')
+
         if User.objects.filter(email=email).exists():
             messages.error(request, 'Email already registered.')
         else:
@@ -59,20 +65,21 @@ def edit_profile_view(request, user_id):
     user = get_object_or_404(User, id=user_id)
     if request.user != user:
         return HttpResponse('Unauthorized', status=401)
-    profile = getattr(user, 'profile', None)
+    profile, created = Profile.objects.get_or_create(user=user)
     if request.method == 'POST':
         user.first_name = request.POST.get('first_name', user.first_name)
         user.last_name = request.POST.get('last_name', user.last_name)
         user.save()
-        if profile:
-            profile.phone_number = request.POST.get('phone_number', profile.phone_number)
-            profile.gender = request.POST.get('gender', profile.gender)
-            profile.bio = request.POST.get('bio', profile.bio)
-            profile.institution = request.POST.get('institution', profile.institution)
-            profile.course_of_study = request.POST.get('course_of_study', profile.course_of_study)
-            profile.organization = request.POST.get('organization', profile.organization)
-            profile.website = request.POST.get('website', profile.website)
-            profile.save()
+        profile.phone_number = request.POST.get('phone_number', profile.phone_number)
+        profile.gender = request.POST.get('gender', profile.gender)
+        profile.bio = request.POST.get('bio', profile.bio)
+        profile.institution = request.POST.get('institution', profile.institution)
+        profile.course_of_study = request.POST.get('course_of_study', profile.course_of_study)
+        profile.organization = request.POST.get('organization', profile.organization)
+        profile.website = request.POST.get('website', profile.website)
+        if 'avatar' in request.FILES:
+            profile.avatar = request.FILES['avatar']
+        profile.save()
         messages.success(request, 'Profile updated successfully.')
         return redirect('profile', user_id=user.id)
     return render(request, 'accounts/edit_profile.html', {'user_obj': user, 'profile': profile})
