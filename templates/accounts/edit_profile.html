@@ -1,5 +1,6 @@
 <!-- filepath: c:\dev\django_project\slumSarathi\templates\accounts\edit_profile.html -->
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Edit Profile{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
@@ -11,8 +12,22 @@
           <div class="alert alert-success">{{ message }}</div>
         {% endfor %}
       {% endif %}
-      <form method="post">
+      <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        <div class="mb-3 d-flex flex-column align-items-center justify-content-center">
+          <label for="avatar" style="cursor:pointer; position:relative;">
+            {% if profile.avatar %}
+              <img id="avatarPreview" src="{{ profile.avatar.url }}" alt="Profile Picture" class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            {% else %}
+              <img id="avatarPreview" src="{% static 'img/profile.jpeg' %}" alt="Default Profile" class="rounded-circle mb-2" style="width: 100px; height: 100px; object-fit: cover; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+            {% endif %}
+            <span style="position:absolute; bottom:10px; right:10px; background:#fff; border-radius:50%; padding:4px;">
+              <i class="bi bi-camera" style="font-size:1.2rem; color:#333;"></i>
+            </span>
+            <input type="file" name="avatar" id="avatar" accept="image/*" class="d-none">
+          </label>
+          <small class="form-text text-muted d-block text-start">Accepted formats: JPG, PNG. Max size: 2MB.</small>
+        </div>
         <div class="mb-3">
           <label class="form-label">First Name:</label>
           <input type="text" name="first_name" value="{{ user_obj.first_name }}" class="form-control">
