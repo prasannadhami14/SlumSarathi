@@ -18,7 +18,18 @@
                 
                 <div class="mb-3">
                     <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
-                    <input type="password" name="password" id="password" class="form-control" required>
+                    <div class="password-input-container">
+                        <input type="password" name="password" id="password" class="form-control" required>
+                        <i class="bi bi-eye password-toggle-icon" id="togglePassword"></i>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="confirm_password" class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                    <div class="password-input-container">
+                        <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+                        <i class="bi bi-eye password-toggle-icon" id="toggleConfirmPassword"></i>
+                    </div>
                 </div>
                 
                 <div class="mb-3">

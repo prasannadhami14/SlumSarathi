@@ -72,3 +72,16 @@ ul>li>a:hover {
         padding-right: 10px !important;
     }
 }
+
+.password-input-container {
+    position: relative;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 100;
+}

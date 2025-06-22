@@ -21,7 +21,7 @@
                              <a class="nav-link dropdown-toggle p-0 d-flex align-items-center"
                                 href="#" id="profileDropdownMobile" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false" style="border: none; background: none;">
-                                <img src="{% static 'img/profile.jpeg' %}" alt="Profile" width="40" height="40"
+                                <img src="{% if user.is_authenticated and user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'img/profile.jpeg' %}{% endif %}" alt="Profile" width="40" height="40"
                                      class="rounded-circle border" style="object-fit:cover;">
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdownMobile">
@@ -73,7 +73,7 @@
                             <a class="nav-link dropdown-toggle p-0 d-flex align-items-center"
                                href="#" id="profileDropdownDesktop" role="button"
                                data-bs-toggle="dropdown" aria-expanded="false" style="border: none; background: none;">
-                                <img src="{% static 'img/profile.jpeg' %}" alt="Profile" width="40" height="40"
+                                <img src="{% if user.is_authenticated and user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'img/profile.jpeg' %}{% endif %}" alt="Profile" width="40" height="40"
                                      class="rounded-circle border" style="object-fit:cover;">
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdownDesktop">
