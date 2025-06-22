@@ -2,16 +2,22 @@
     <div class="col-12 col-sm-8 col-md-6 col-lg-4" style="max-width: 320px;">
         <div class="card h-100 shadow-sm mx-auto" style="width: 100%; min-width: 220px;">
             {% if service.images.first %}
-                <img src="{{ service.images.first.image.url }}" class="card-img-top w-100" alt="{{ service.title }}"
-                     style="height:180px; width:100%; object-fit:contain; background:#f8f9fa; border-bottom:1px solid #eee; display:block;">
+                <a href="{% url 'services:service_detail' service.id %}">
+                    <img src="{{ service.images.first.image.url }}" class="card-img-top w-100" alt="{{ service.title }}"
+                         style="height:180px; width:100%; object-fit:contain; background:#f8f9fa; border-bottom:1px solid #eee; display:block;">
+                </a>
             {% else %}
-                <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
-                     style="height:180px;">
-                    <span class="text-muted">No Image</span>
-                </div>
+                <a href="{% url 'services:service_detail' service.id %}">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                         style="height:180px;">
+                        <span class="text-muted">No Image</span>
+                    </div>
+                </a>
             {% endif %}
             <div class="card-body d-flex flex-column">
-                <h5 class="card-title">{{ service.title }}</h5>
+                <h5 class="card-title">
+                    <a href="{% url 'services:service_detail' service.id %}" class="text-decoration-none text-dark">{{ service.title }}</a>
+                </h5>
                 <p class="card-text mb-1"><strong>Type:</strong> {{ service.get_service_type_display }}</p>
                 <p class="card-text mb-1"><strong>Price:</strong> {{ service.display_price }}</p>
                 <p class="card-text text-truncate">{{ service.description|truncatechars:80 }}</p>
