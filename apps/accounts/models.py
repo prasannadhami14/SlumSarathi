@@ -165,3 +165,25 @@ class PasswordResetToken(models.Model):
         """Mark token as used"""
         self.is_used = True
         self.save()
+
+
+class EmailVerificationToken(models.Model):
+    """Model for storing email verification tokens"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = _('email verification token')
+        verbose_name_plural = _('email verification tokens')
+
+    def is_valid(self):
+        """Check if the token is still valid"""
+        return not self.is_used and timezone.now() < self.expires_at
+
+    def mark_as_used(self):
+        """Mark token as used"""
+        self.is_used = True
+        self.save()

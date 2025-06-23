@@ -4,20 +4,24 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.contrib import messages
 from django.utils import timezone
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
-from .models import User, Profile, PasswordResetToken
+from .models import User, Profile, PasswordResetToken, EmailVerificationToken
 import datetime
 from django.urls import reverse
+from django.template.loader import render_to_string
 
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-        user = authenticate(request, username=email, password=password)  # <--- use username
+        user = authenticate(request, username=email, password=password)
         if user is not None:
+            if not user.is_verified:
+                messages.error(request, 'Please verify your email before logging in.')
+                return render(request, 'accounts/login.html')
             login(request, user)
-            return redirect('homepage')  # Redirect to homepage after login
+            return redirect('homepage')
         else:
             messages.error(request, 'Invalid email or password.')
     return render(request, 'accounts/login.html')
@@ -50,8 +54,29 @@ def register_view(request):
                 user_type=user_type
             )
             Profile.objects.create(user=user)
-            login(request, user)
-            return redirect('profile', user_id=user.id)
+            # Create email verification token (valid for 24 hours)
+            expires_at = timezone.now() + datetime.timedelta(hours=24)
+            token = EmailVerificationToken.objects.create(user=user, expires_at=expires_at)
+            verification_link = request.build_absolute_uri(
+                reverse('verify_email', args=[str(token.token)])
+            )
+            subject = 'Verify your email address'
+            from_email = settings.DEFAULT_FROM_EMAIL
+            to_email = [user.email]
+
+            # Render HTML and plain text versions
+            html_content = render_to_string('accounts/verify_email.html', {
+                'user': user,
+                'verification_link': verification_link,
+            })
+            text_content = f"Hi {user.get_full_name() or user.email},\n\nThank you for registering! Please verify your email by clicking the link below:\n\n{verification_link}\n\nIf you did not register, please ignore this email.\n\nBest regards,\nThe slumSarathi Team"
+
+            msg = EmailMultiAlternatives(subject, text_content, from_email, to_email)
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+
+            messages.success(request, 'Registration successful! Please check your email to verify your account within 24 hours.')
+            return redirect('login')
     return render(request, 'accounts/register.html')
 
 @login_required
@@ -125,3 +150,21 @@ def reset_password_view(request, token):
         else:
             messages.error(request, 'Passwords do not match.')
     return render(request, 'accounts/reset_password.html', {'token': token})
+
+def verify_email_view(request, uuid):
+    try:
+        token_obj = EmailVerificationToken.objects.get(token=uuid)
+        if not token_obj.is_valid():
+            messages.error(request, 'This verification link is invalid or has expired.')
+            return redirect('login')
+        user = token_obj.user
+        if not user.is_verified:
+            user.is_verified = True
+            user.save()
+            token_obj.mark_as_used()
+            messages.success(request, 'Your email has been verified. You can now log in.')
+        else:
+            messages.info(request, 'Your email is already verified.')
+    except EmailVerificationToken.DoesNotExist:
+        messages.error(request, 'Invalid verification link.')
+    return redirect('login')
