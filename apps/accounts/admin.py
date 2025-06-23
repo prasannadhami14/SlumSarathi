@@ -22,6 +22,18 @@ class UserAdmin(BaseUserAdmin):
     )
     filter_horizontal = ('groups', 'user_permissions',)
 
+    actions = ['mark_as_verified', 'mark_as_unverified']
+
+    def mark_as_verified(self, request, queryset):
+        updated = queryset.update(is_verified=True)
+        self.message_user(request, f"{updated} user(s) marked as verified.")
+    mark_as_verified.short_description = "Mark selected users as verified"
+
+    def mark_as_unverified(self, request, queryset):
+        updated = queryset.update(is_verified=False)
+        self.message_user(request, f"{updated} user(s) marked as unverified.")
+    mark_as_unverified.short_description = "Mark selected users as unverified"
+
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'phone_number', 'gender', 'institution', 'organization', 'created_at')
     search_fields = ('user__email', 'institution', 'organization')
