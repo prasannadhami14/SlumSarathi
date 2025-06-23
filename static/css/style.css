@@ -85,3 +85,14 @@ ul>li>a:hover {
     cursor: pointer;
     z-index: 100;
 }
+
+.red-dot {
+    width: 10px;
+    height: 10px;
+    background: red;
+    border-radius: 50%;
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
