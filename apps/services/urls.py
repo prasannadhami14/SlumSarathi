@@ -33,4 +33,5 @@ urlpatterns = [
 
     # AJAX URLs
     path('ajax/search/', views.ajax_service_search, name='ajax_service_search'),
+    path('notification-count/', views.notification_count, name='notification_count'),
 ]

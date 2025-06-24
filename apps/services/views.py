@@ -224,3 +224,9 @@ def ajax_service_search(request):
         services = services.filter(title__icontains=query)
     html = render_to_string('services/_service_list_items.html', {'services': services})
     return JsonResponse({'html': html})
+
+@login_required
+def notification_count(request):
+    # Count incoming service requests for the current user (as provider)
+    count = ServiceRequest.objects.filter(service__provider=request.user, status='pending').count()
+    return JsonResponse({'count': count})
